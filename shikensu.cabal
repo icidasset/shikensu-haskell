@@ -3,7 +3,7 @@ version: 0.1.0
 category: File IO
 
 synopsis:
-  A small functional toolset for building static websites
+  A small toolset for building static websites
 
 description:
   Please see README.md
