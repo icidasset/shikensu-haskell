@@ -65,12 +65,9 @@ type Pattern = String
 -}
 list :: [Pattern] -> FilePath -> IO Dictionary
 list patterns rootPath =
-  let
-    patterns'             = List.map Glob.compile patterns
-    globResult            = Glob.globDir patterns' rootPath
-    matchingFilePaths     = fmap fst globResult
-  in
-    matchingFilePaths
+  patterns
+    |> compilePatterns
+    |> globDir rootPath
     |> fmap (List.zip patterns)
     |> fmap (List.map (makeDictionary rootPath))
     |> fmap (List.concat)
@@ -78,15 +75,6 @@ list patterns rootPath =
 
 
 -- Definitions & Dictionary functions
-
-
-makeDictionary :: FilePath -> (Pattern, [FilePath]) -> Dictionary
-makeDictionary rootPath fileListWithPattern =
-  let
-    pattern = fst fileListWithPattern
-    fileList = snd fileListWithPattern
-  in
-    map (makeDefinition pattern rootPath) fileList
 
 
 makeDefinition :: Pattern -> FilePath -> FilePath -> Definition
@@ -114,10 +102,25 @@ makeDefinition pattern rootPath absPath =
       }
 
 
+makeDictionary :: FilePath -> (Pattern, [FilePath]) -> Dictionary
+makeDictionary rootPath fileListWithPattern =
+  let
+    pattern = fst fileListWithPattern
+    fileList = snd fileListWithPattern
+  in
+    map (makeDefinition pattern rootPath) fileList
+
 
 -- Utility functions
 
 
 cleanPath :: FilePath -> FilePath
-cleanPath =
-  (dropDrive . dropTrailingPathSeparator . normalise)
+cleanPath = (dropDrive . dropTrailingPathSeparator . normalise)
+
+
+compilePatterns :: [Pattern] -> [Glob.Pattern]
+compilePatterns = List.map Glob.compile
+
+
+globDir :: FilePath -> [Glob.Pattern] -> IO [[FilePath]]
+globDir a b = fmap fst (Glob.globDir b a)
