@@ -80,14 +80,14 @@ list patterns rootPath =
 makeDefinition :: Pattern -> FilePath -> FilePath -> Definition
 makeDefinition pattern rootPath absPath =
   let
-    workingDir  = (cleanPath . fst) (Glob.commonDirectory (Glob.compile pattern))
-    localPath   = (cleanPath . fromJust) (List.stripPrefix rootPath absPath)
-    dirname     = (cleanPath . fromJust) (List.stripPrefix workingDir (takeDirectory localPath))
+    workingDir      = (cleanPath . fst) (Glob.commonDirectory (Glob.compile pattern))
+    absWorkingDir   = (addTrailingPathSeparator . joinPath) [rootPath, workingDir]
+    localPath       = (cleanPath . fromJust) (List.stripPrefix absWorkingDir absPath)
   in
     Definition
       { absolutePath = absPath
       , basename = takeBaseName localPath
-      , dirname = dirname
+      , dirname = takeDirectory localPath
       , extname = takeExtension localPath
       , localPath = localPath
       , pattern = pattern
@@ -98,7 +98,7 @@ makeDefinition pattern rootPath absPath =
       , content = Nothing
       , metadata = Map.empty
       , parentPath = Nothing
-      , pathToRoot = "./"
+      , pathToRoot = "./TODO"
       }
 
 
@@ -109,6 +109,7 @@ makeDictionary rootPath fileListWithPattern =
     fileList = snd fileListWithPattern
   in
     map (makeDefinition pattern rootPath) fileList
+
 
 
 -- Utility functions
