@@ -1,4 +1,4 @@
-module Shikensu (Definition, Dictionary, list) where
+module Shikensu where
 
 
 {-| How to use
@@ -27,11 +27,10 @@ https://hackage.haskell.org/package/text-1.2.2.1/docs/Data-Text-Lazy-IO.html
 
 import Flow
 
-import Debug.Trace
 import Data.Map.Lazy (Map)
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromJust)
 import Data.String
-import Data.Tuple
+import Data.Tuple (fst, snd)
 import System.FilePath
 
 import qualified Data.List as List
@@ -41,12 +40,12 @@ import qualified System.FilePath.Glob as Glob
 
 data Definition =
   Definition
-    { basename :: String
+    { absolutePath :: FilePath
+    , basename :: String
     , dirname :: FilePath
-    , entirePath :: FilePath
     , extname :: String
-    , path :: FilePath
-    , pattern :: Maybe String
+    , localPath :: FilePath
+    , pattern :: Pattern
     , root :: FilePath
     , wd :: FilePath
 
@@ -55,47 +54,70 @@ data Definition =
     , metadata :: Map String String
     , parentPath :: Maybe FilePath
     , pathToRoot :: FilePath
-    }
+    } deriving (Show)
 
 
 type Dictionary = [Definition]
+type Pattern = String
 
 
-{-| Make a dictionary based on a given path and pattern.
+{-| Make a single dictionary based on multiple glob patterns and a path to a directory.
 -}
-list :: [String] -> FilePath -> IO Dictionary
+list :: [Pattern] -> FilePath -> IO Dictionary
 list patterns rootPath =
   let
-    patterns' = map Glob.compile patterns
-    matchingFilePaths = fmap fst (Glob.globDir patterns' rootPath)
+    patterns'             = List.map Glob.compile patterns
+    globResult            = Glob.globDir patterns' rootPath
+    matchingFilePaths     = fmap fst globResult
   in
-    fmap (List.concat .> makeDictionary) matchingFilePaths
+    matchingFilePaths
+    |> fmap (List.zip patterns)
+    |> fmap (List.map (makeDictionary rootPath))
+    |> fmap (List.concat)
 
 
 
--- Private
+-- Definitions & Dictionary functions
 
 
-makeDictionary :: [FilePath] -> Dictionary
-makeDictionary fileList =
-  map makeDefinition fileList
+makeDictionary :: FilePath -> (Pattern, [FilePath]) -> Dictionary
+makeDictionary rootPath fileListWithPattern =
+  let
+    pattern = fst fileListWithPattern
+    fileList = snd fileListWithPattern
+  in
+    map (makeDefinition pattern rootPath) fileList
 
 
-makeDefinition :: FilePath -> Definition
-makeDefinition filePath =
-  Definition
-    { basename = takeBaseName filePath
-    , dirname = takeDirectory filePath
-    , entirePath = filePath
-    , extname = takeExtension filePath
-    , path = filePath
-    , pattern = Just "TODO"
-    , root = "TODO"
-    , wd = "TODO"
+makeDefinition :: Pattern -> FilePath -> FilePath -> Definition
+makeDefinition pattern rootPath absPath =
+  let
+    workingDir  = (cleanPath . fst) (Glob.commonDirectory (Glob.compile pattern))
+    localPath   = (cleanPath . fromJust) (List.stripPrefix rootPath absPath)
+    dirname     = (cleanPath . fromJust) (List.stripPrefix workingDir (takeDirectory localPath))
+  in
+    Definition
+      { absolutePath = absPath
+      , basename = takeBaseName localPath
+      , dirname = dirname
+      , extname = takeExtension localPath
+      , localPath = localPath
+      , pattern = pattern
+      , root = rootPath
+      , wd = workingDir
 
-    -- Additional properties
-    , content = Nothing
-    , metadata = Map.empty
-    , parentPath = Nothing
-    , pathToRoot = "./"
-    }
+      -- Additional properties
+      , content = Nothing
+      , metadata = Map.empty
+      , parentPath = Nothing
+      , pathToRoot = "./"
+      }
+
+
+
+-- Utility functions
+
+
+cleanPath :: FilePath -> FilePath
+cleanPath =
+  (dropDrive . dropTrailingPathSeparator . normalise)
