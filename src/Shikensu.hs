@@ -38,6 +38,8 @@ import qualified Data.Map.Lazy as Map
 import qualified System.FilePath.Glob as Glob
 
 
+{-| A file definition, along with some additional properties.
+-}
 data Definition =
   Definition
     { absolutePath :: FilePath
@@ -46,8 +48,8 @@ data Definition =
     , extname :: String
     , localPath :: FilePath
     , pattern :: Pattern
-    , root :: FilePath
-    , wd :: FilePath
+    , rootPath :: FilePath
+    , workingDirectory :: FilePath
 
     -- Additional properties
     , content :: Maybe String
@@ -57,8 +59,29 @@ data Definition =
     } deriving (Show)
 
 
+{-| Definition dependencies.
+
+A set of properties all definitions from a `Dictionary` produced
+by `makeDictionary` have in common.
+-}
+data Dependencies =
+  Dependencies
+    { _pattern :: String
+    , _rootPath :: FilePath
+    }
+
+
+
+-- Type aliases
+
+
 type Dictionary = [Definition]
 type Pattern = String
+
+
+
+-- Main functions
+-- (ie. functions that you will use the most)
 
 
 {-| Make a single dictionary based on multiple glob patterns and a path to a directory.
@@ -77,12 +100,18 @@ list patterns rootPath =
 -- Definitions & Dictionary functions
 
 
-makeDefinition :: Pattern -> FilePath -> FilePath -> Definition
-makeDefinition pattern rootPath absPath =
+makeDefinition :: Dependencies -> FilePath -> Definition
+makeDefinition deps absPath =
   let
-    workingDir      = (cleanPath . fst) (Glob.commonDirectory (Glob.compile pattern))
-    absWorkingDir   = (addTrailingPathSeparator . joinPath) [rootPath, workingDir]
-    localPath       = (cleanPath . fromJust) (List.stripPrefix absWorkingDir absPath)
+    pattern         = _pattern deps
+    rootPath        = _rootPath deps
+
+    -- The following assumes that absPath and rootPath have a format of `/a/b/c(/)`
+    -- (ie. for POSIX systems with an optional trailing path-separator)
+
+    workingDir      = (cleanPath <. fst) (Glob.commonDirectory (Glob.compile pattern))
+    absWorkingDir   = (joinPath) [rootPath, workingDir]
+    localPath       = (cleanPath <. fromJust) (List.stripPrefix absWorkingDir absPath)
   in
     Definition
       { absolutePath = absPath
@@ -91,8 +120,8 @@ makeDefinition pattern rootPath absPath =
       , extname = takeExtension localPath
       , localPath = localPath
       , pattern = pattern
-      , root = rootPath
-      , wd = workingDir
+      , rootPath = rootPath
+      , workingDirectory = workingDir
 
       -- Additional properties
       , content = Nothing
@@ -103,12 +132,13 @@ makeDefinition pattern rootPath absPath =
 
 
 makeDictionary :: FilePath -> (Pattern, [FilePath]) -> Dictionary
-makeDictionary rootPath fileListWithPattern =
+makeDictionary rootPath patternAndFileList =
   let
-    pattern = fst fileListWithPattern
-    fileList = snd fileListWithPattern
+    pattern = fst patternAndFileList
+    fileList = snd patternAndFileList
+    deps = Dependencies { _pattern = pattern, _rootPath = rootPath }
   in
-    map (makeDefinition pattern rootPath) fileList
+    map (makeDefinition deps) fileList
 
 
 
@@ -116,7 +146,7 @@ makeDictionary rootPath fileListWithPattern =
 
 
 cleanPath :: FilePath -> FilePath
-cleanPath = (dropDrive . dropTrailingPathSeparator . normalise)
+cleanPath = (normalise .> dropTrailingPathSeparator .> dropDrive)
 
 
 compilePatterns :: [Pattern] -> [Glob.Pattern]
