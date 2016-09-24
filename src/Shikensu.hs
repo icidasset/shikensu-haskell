@@ -112,11 +112,14 @@ makeDefinition deps absPath =
     workingDir      = (cleanPath <. fst) (Glob.commonDirectory (Glob.compile pattern))
     absWorkingDir   = (joinPath) [rootPath, workingDir]
     localPath       = (cleanPath <. fromJust) (List.stripPrefix absWorkingDir absPath)
+
+    dirname         = takeDirectory localPath
+    dirname'        = if dirname == "." then "" else dirname
   in
     Definition
       { absolutePath = absPath
       , basename = takeBaseName localPath
-      , dirname = takeDirectory localPath
+      , dirname = dirname'
       , extname = takeExtension localPath
       , localPath = localPath
       , pattern = pattern
@@ -126,8 +129,8 @@ makeDefinition deps absPath =
       -- Additional properties
       , content = Nothing
       , metadata = Map.empty
-      , parentPath = Nothing
-      , pathToRoot = "./TODO"
+      , parentPath = compileParentPath dirname'
+      , pathToRoot = compilePathToRoot dirname'
       }
 
 
@@ -153,5 +156,38 @@ compilePatterns :: [Pattern] -> [Glob.Pattern]
 compilePatterns = List.map Glob.compile
 
 
+{-| Path to parent, when there is one.
+
+    Just "../" or Nothing
+-}
+compileParentPath :: FilePath -> Maybe FilePath
+compileParentPath dirname =
+  case dirname of
+    "" -> Nothing
+    _  -> Just "../"
+
+
+{-| Path to root.
+
+Example, if `dirname` is 'example/subdir',
+then this will be `../../`.
+
+If the `dirname` is empty,
+then this will be empty as well.
+-}
+compilePathToRoot :: FilePath -> FilePath
+compilePathToRoot dirname =
+  if dirname == "" then
+    ""
+  else
+    dirname
+      |> splitDirectories
+      |> fmap (\_ -> "..")
+      |> joinPath
+      |> addTrailingPathSeparator
+
+
+{-| List contents of a directory using a glob pattern.
+-}
 globDir :: FilePath -> [Glob.Pattern] -> IO [[FilePath]]
 globDir a b = fmap fst (Glob.globDir b a)
