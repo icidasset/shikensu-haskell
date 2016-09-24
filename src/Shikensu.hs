@@ -107,7 +107,7 @@ makeDefinition deps absPath =
     rootPath        = _rootPath deps
 
     -- The following assumes that absPath and rootPath have a format of `/a/b/c(/)`
-    -- (ie. for POSIX systems with an optional trailing path-separator)
+    -- (ie. for POSIX systems)
 
     workingDir      = (cleanPath <. fst) (Glob.commonDirectory (Glob.compile pattern))
     absWorkingDir   = (joinPath) [rootPath, workingDir]
