@@ -3,6 +3,9 @@ module Shikensu where
 
 {-| How to use
 
+    import Shikensu (list)
+    import Shikensu.Contrib.IO (read, rename, write)
+
     dictionary_io =
       Shikensu.list ["**/*.html"] absolute_path
 
@@ -63,6 +66,7 @@ data Definition =
 
 A set of properties all definitions from a `Dictionary` produced
 by `makeDictionary` have in common.
+
 -}
 data Dependencies =
   Dependencies
@@ -85,6 +89,14 @@ type Pattern = String
 
 
 {-| Make a single dictionary based on multiple glob patterns and a path to a directory.
+
+1. Compile patterns so `globDir` can use them.
+2. Run `globDir` function on the given (root) path.
+3. We get a list back for each pattern (ie. a list of lists),
+   here we put each child list in a tuple along with its pattern.
+4. We make a Dictionary out of each tuple (this also needs the path).
+5. Merge the dictionaries into one dictionary.
+
 -}
 list :: [Pattern] -> FilePath -> IO Dictionary
 list patterns rootPath =
@@ -96,10 +108,46 @@ list patterns rootPath =
     |> fmap (List.concat)
 
 
+{-| Sorting functions used to sort Dictionaries.
+
+Example:
+
+    List.sortBy Shikensu.sortByAbsolutePath dictionary
+
+-}
+sortByAbsolutePath :: Definition -> Definition -> Ordering
+sortByAbsolutePath defA defB =
+  compare (absolutePath defA) (absolutePath defB)
+
+
 
 -- Definitions & Dictionary functions
 
 
+{-| Make a Definition.
+
+Example definition, given:
+- the absolute path `/Users/icidasset/Projects/shikensu/example/test/hello.md`
+- {deps} the root path `/Users/icidasset/Projects/shikensu`
+- {deps} the pattern `example/**/*.md`
+
+    Definition
+      { absolutePath = "/Users/icidasset/Projects/shikensu/example/test/hello.md"
+      , basename = "hello"
+      , dirname = "test"
+      , extname = "md"
+      , localPath = "test/hello.md"
+      , pattern = "example/**/*.md"
+      , rootPath = "/Users/icidasset/Projects/shikensu"
+      , workingDirectory = "example"
+
+      , content = Nothing
+      , metadata = Map.empty
+      , parentPath = "../"
+      , pathToRoot = "../../"
+      }
+
+-}
 makeDefinition :: Dependencies -> FilePath -> Definition
 makeDefinition deps absPath =
   let
@@ -134,6 +182,8 @@ makeDefinition deps absPath =
       }
 
 
+{-| Make a Dictionary
+-}
 makeDictionary :: FilePath -> (Pattern, [FilePath]) -> Dictionary
 makeDictionary rootPath patternAndFileList =
   let
@@ -159,6 +209,7 @@ compilePatterns = List.map Glob.compile
 {-| Path to parent, when there is one.
 
     Just "../" or Nothing
+
 -}
 compileParentPath :: FilePath -> Maybe FilePath
 compileParentPath dirname =
@@ -174,6 +225,7 @@ then this will be `../../`.
 
 If the `dirname` is empty,
 then this will be empty as well.
+
 -}
 compilePathToRoot :: FilePath -> FilePath
 compilePathToRoot dirname =
