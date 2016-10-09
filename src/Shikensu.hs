@@ -30,10 +30,11 @@ That is:
 
 -}
 
+import Debug.Trace
 import Flow
 
 import Data.Map.Lazy (Map)
-import Data.Maybe (fromJust)
+import Data.Maybe (fromJust, fromMaybe)
 import Data.String
 import Data.Tuple (fst, snd)
 import System.FilePath
@@ -152,19 +153,20 @@ makeDefinition deps absPath =
   let
     pattern         = _pattern deps
     rootPath        = _rootPath deps
+    absPath'        = normalise absPath
 
     -- The following assumes that absPath and rootPath have a format of `/a/b/c(/)`
     -- (ie. for POSIX systems)
 
     workingDir      = (cleanPath <. fst) (Glob.commonDirectory (Glob.compile pattern))
     absWorkingDir   = (joinPath) [rootPath, workingDir]
-    localPath       = (cleanPath <. fromJust) (List.stripPrefix absWorkingDir absPath)
+    localPath       = (cleanPath) (stripPrefix absWorkingDir absPath')
 
     dirname         = takeDirectory localPath
     dirname'        = if dirname == "." then "" else dirname
   in
     Definition
-      { absolutePath = absPath
+      { absolutePath = absPath'
       , basename = takeBaseName localPath
       , dirname = dirname'
       , extname = takeExtension localPath
@@ -198,7 +200,7 @@ makeDictionary rootPath patternAndFileList =
 
 
 cleanPath :: FilePath -> FilePath
-cleanPath = (normalise .> dropTrailingPathSeparator .> dropDrive)
+cleanPath = normalise .> dropTrailingPathSeparator .> dropDrive .> replaceSingleDot
 
 
 compilePatterns :: [Pattern] -> [Glob.Pattern]
@@ -248,3 +250,17 @@ emptyContent = return ""
 -}
 globDir :: FilePath -> [Glob.Pattern] -> IO [[FilePath]]
 globDir a b = fmap fst (Glob.globDir b a)
+
+
+{-| If the path is a single dot, return an empty string.
+Otherwise return the path.
+-}
+replaceSingleDot :: String -> String
+replaceSingleDot path =
+  if path == "." then "" else path
+
+
+{-| Strip prefix
+-}
+stripPrefix :: String -> String -> String
+stripPrefix prefix target = fromMaybe target (List.stripPrefix prefix target)

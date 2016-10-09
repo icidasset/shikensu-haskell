@@ -2,14 +2,19 @@ module Test.Helpers where
 
 import Shikensu (Dictionary, sortByAbsolutePath)
 import System.Directory (canonicalizePath)
-import Test.Tasty.HUnit (assertEqual)
+import System.FilePath (combine)
+import Test.Tasty.HUnit (Assertion, assertEqual)
 
 import qualified Data.List as List
 
 
-assertDef :: (Show a1, Eq a1) => IO a -> (a -> a1) -> a1 -> IO ()
+assertDef :: (Show b, Eq b) => IO a -> (a -> b) -> b -> IO ()
 assertDef definition accessor value =
-  (fmap accessor definition) >>= (assertEqual "" value)
+  (fmap accessor definition) >>= (assertEq value)
+
+
+assertEq :: (Eq a, Show a) => a -> a -> Assertion
+assertEq = assertEqual ""
 
 
 rootPath :: IO FilePath
@@ -18,3 +23,7 @@ rootPath = canonicalizePath "./"
 
 sort :: Dictionary -> Dictionary
 sort = List.sortBy sortByAbsolutePath
+
+
+testsPath :: IO FilePath
+testsPath = fmap ((flip combine) "tests") rootPath
