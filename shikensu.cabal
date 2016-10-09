@@ -34,7 +34,9 @@ library
     src
 
   exposed-modules:
-    Shikensu
+    Shikensu,
+    Shikensu.Contrib.IO,
+    Shikensu.Contrib.Pure
 
   build-depends:
     base == 4.*,
@@ -42,7 +44,8 @@ library
     directory >= 1.2 && < 2,
     filepath == 1.4.*,
     flow == 1.0.*,
-    Glob == 0.7.*
+    Glob == 0.7.*,
+    text >= 1.2 && < 2
 
 
 test-suite tests
@@ -56,10 +59,15 @@ test-suite tests
     exitcode-stdio-1.0
 
   hs-source-dirs:
-    test
+    tests
 
   main-is:
-    Spec.hs
+    Test.hs
+
+  other-modules:
+    Test.Contrib,
+    Test.Helpers,
+    Test.Shikensu
 
   build-depends:
     base,

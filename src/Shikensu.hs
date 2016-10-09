@@ -1,7 +1,9 @@
 module Shikensu where
 
 
-{-| How to use
+{-| Shikensu.
+
+## How to use
 
     import Shikensu (list)
     import Shikensu.Contrib.IO (read, rename, write)
@@ -14,17 +16,17 @@ module Shikensu where
       |> rename "main.html" "index.html"
       |> write "./build"
 
--}
 
+## Additional info
 
-{-| Resources
+The code in this module is written in order of importance.
+That is:
 
-Inspiration
-https://github.com/elm-lang/elm-make
-https://github.com/elm-lang/elm-compiler
-
-File IO, writing Strings to disk
-https://hackage.haskell.org/package/text-1.2.2.1/docs/Data-Text-Lazy-IO.html
+1. Records and types
+2. Functions you will use all the time
+3. Functions you will sometimes use
+4. Functions you will seldom use
+5. ...
 
 -}
 
@@ -55,11 +57,11 @@ data Definition =
     , workingDirectory :: FilePath
 
     -- Additional properties
-    , content :: Maybe String
+    , content :: IO String
     , metadata :: Map String String
     , parentPath :: Maybe FilePath
     , pathToRoot :: FilePath
-    } deriving (Show)
+    }
 
 
 {-| Definition dependencies.
@@ -85,7 +87,6 @@ type Pattern = String
 
 
 -- Main functions
--- (ie. functions that you will use the most)
 
 
 {-| Make a single dictionary based on multiple glob patterns and a path to a directory.
@@ -108,13 +109,11 @@ list patterns rootPath =
     |> fmap (List.concat)
 
 
-{-| Sorting functions used to sort Dictionaries.
 
-Example:
+-- Sorting functions
+--   (e.g. `List.sortBy Shikensu.sortByAbsolutePath dictionary`)
 
-    List.sortBy Shikensu.sortByAbsolutePath dictionary
 
--}
 sortByAbsolutePath :: Definition -> Definition -> Ordering
 sortByAbsolutePath defA defB =
   compare (absolutePath defA) (absolutePath defB)
@@ -175,7 +174,7 @@ makeDefinition deps absPath =
       , workingDirectory = workingDir
 
       -- Additional properties
-      , content = Nothing
+      , content = emptyContent
       , metadata = Map.empty
       , parentPath = compileParentPath dirname'
       , pathToRoot = compilePathToRoot dirname'
@@ -237,6 +236,12 @@ compilePathToRoot dirname =
       |> fmap (\_ -> "..")
       |> joinPath
       |> addTrailingPathSeparator
+
+
+{-| No content.
+-}
+emptyContent :: IO String
+emptyContent = return ""
 
 
 {-| List contents of a directory using a glob pattern.

@@ -1,9 +1,4 @@
-import System.Directory (canonicalizePath)
-import Test.Tasty
-import Test.Tasty.HUnit
-
-import qualified Data.List as List
-import qualified Shikensu
+module Test.Shikensu (shikensuTests) where
 
 
 {-| TODO
@@ -17,53 +12,31 @@ Write tests for multiple cases:
 
 -}
 
+import Test.Helpers
+import Test.Tasty
+import Test.Tasty.HUnit
 
-main :: IO ()
-main = defaultMain tests
-
-
-tests :: TestTree
-tests = testGroup "Tests" [unitTests]
-
+import qualified Data.List as List (head)
+import qualified Shikensu
 
 
--- Test data
-
-
-rootPath :: IO FilePath
-rootPath = canonicalizePath "./"
-
-
-
--- Helpers
-
-
-assertDef :: (Show b, Eq b) => IO a -> (a -> b) -> b -> IO ()
-assertDef def recFn value =
-  fmap recFn def >>= assertEqual "" value
-
-
-sort :: Shikensu.Dictionary -> Shikensu.Dictionary
-sort = List.sortBy Shikensu.sortByAbsolutePath
+shikensuTests :: TestTree
+shikensuTests = testGroup "Shikensu tests" [testA]
 
 
 
 -- Tests
 
 
-unitTests :: TestTree
-unitTests = testGroup "Unit tests" [testA]
-
-
 testA :: TestTree
 testA =
   let
-    pattern = "test/**/*.md"
+    pattern = "tests/**/*.md"
     dictionary = fmap sort $ rootPath >>= Shikensu.list [pattern]
     definition = fmap List.head dictionary
     localPath = "fixtures/example.md"
   in
-    testGroup "Unit tests"
+    testGroup "Test A"
       [ testCase "Should have the correct basename"
         $ assertDef definition Shikensu.basename "example"
 
@@ -80,6 +53,6 @@ testA =
         $ assertDef definition Shikensu.pattern pattern
 
       , testCase "Should have the correct workingDirectory"
-        $ assertDef definition Shikensu.workingDirectory "test"
+        $ assertDef definition Shikensu.workingDirectory "tests"
 
       ]
