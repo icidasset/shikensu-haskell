@@ -161,14 +161,12 @@ makeDefinition deps absPath =
     workingDir      = (cleanPath <. fst) (Glob.commonDirectory (Glob.compile pattern))
     absWorkingDir   = (joinPath) [rootPath, workingDir]
     localPath       = (cleanPath) (stripPrefix absWorkingDir absPath')
-
-    dirname         = takeDirectory localPath
-    dirname'        = if dirname == "." then "" else dirname
+    dirname         = (takeDirectory .> replaceSingleDot) localPath
   in
     Definition
       { absolutePath = absPath'
       , basename = takeBaseName localPath
-      , dirname = dirname'
+      , dirname = dirname
       , extname = takeExtension localPath
       , localPath = localPath
       , pattern = pattern
@@ -178,8 +176,8 @@ makeDefinition deps absPath =
       -- Additional properties
       , content = emptyContent
       , metadata = Map.empty
-      , parentPath = compileParentPath dirname'
-      , pathToRoot = compilePathToRoot dirname'
+      , parentPath = compileParentPath dirname
+      , pathToRoot = compilePathToRoot dirname
       }
 
 
