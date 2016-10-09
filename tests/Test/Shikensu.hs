@@ -1,17 +1,6 @@
 module Test.Shikensu (shikensuTests) where
 
 
-{-| TODO
-
-Write tests for multiple cases:
-
-1. Pattern with "static" directory (e.g. "src/**/*.hs")
-2. Pattern without "static" directory (e.g. "**/*.hs")
-3. Pattern with leading dot-slash (e.g. "./src/**/*.hs")
-4. ...
-
--}
-
 import Test.Helpers
 import Test.Tasty
 import Test.Tasty.HUnit
