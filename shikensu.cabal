@@ -43,7 +43,7 @@ library
   build-depends:
     base == 4.*,
     containers >= 0.5 && < 1,
-    directory >= 1.2 && < 2,
+    directory >= 1.2.6 && < 2,
     filepath == 1.4.*,
     flow == 1.0.*,
     Glob == 0.7.*,
@@ -78,4 +78,5 @@ test-suite tests
     flow,
     shikensu,
     tasty == 0.11.*,
-    tasty-hunit == 0.9.*
+    tasty-hunit == 0.9.*,
+    text
