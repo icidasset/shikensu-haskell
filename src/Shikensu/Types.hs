@@ -7,11 +7,9 @@ import Data.Map.Lazy (Map)
 -}
 data Definition =
   Definition
-    { absolutePath :: FilePath
-    , basename :: String
+    { basename :: String
     , dirname :: FilePath
     , extname :: String
-    , localPath :: FilePath
     , pattern :: Pattern
     , rootPath :: FilePath
     , workingDirectory :: FilePath

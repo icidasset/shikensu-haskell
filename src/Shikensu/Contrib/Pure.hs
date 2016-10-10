@@ -14,6 +14,7 @@ https://hackage.haskell.org/package/text-1.2.2.1/docs/Data-Text-Lazy-IO.html
 
 import Debug.Trace (traceIO)
 import Flow
+import Shikensu (absolutePath, localPath)
 import Shikensu.Types
 import System.Directory (createDirectory)
 import System.FilePath (combine, takeDirectory)

@@ -59,11 +59,9 @@ Example definition, given:
 - {deps} the pattern `example/**/*.md`
 
     Definition
-      { absolutePath = "/Users/icidasset/Projects/shikensu/example/test/hello.md"
-      , basename = "hello"
+      { basename = "hello"
       , dirname = "test"
-      , extname = "md"
-      , localPath = "test/hello.md"
+      , extname = ".md"
       , pattern = "example/**/*.md"
       , rootPath = "/Users/icidasset/Projects/shikensu"
       , workingDirectory = "example"
@@ -91,11 +89,9 @@ makeDefinition deps absPath =
     dirname         = replaceSingleDot (takeDirectory localPath)
   in
     Definition
-      { absolutePath = absPath'
-      , basename = takeBaseName localPath
+      { basename = takeBaseName localPath
       , dirname = dirname
       , extname = takeExtension localPath
-      , localPath = localPath
       , pattern = pattern
       , rootPath = rootPath
       , workingDirectory = workingDir
@@ -119,6 +115,21 @@ makeDictionary rootPath patternAndFileList =
     deps = Dependencies { _pattern = pattern, _rootPath = rootPath }
   in
     map (makeDefinition deps) fileList
+
+
+
+
+-- Path functions
+
+
+absolutePath :: Definition -> String
+absolutePath def =
+  joinPath [rootPath def, localPath def]
+
+
+localPath :: Definition -> String
+localPath def =
+  joinPath [workingDirectory def, dirname def, (basename def) ++ (extname def)]
 
 
 
