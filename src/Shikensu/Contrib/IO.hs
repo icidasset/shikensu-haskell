@@ -1,6 +1,6 @@
 module Shikensu.Contrib.IO where
 
-import Shikensu (Dictionary)
+import Shikensu.Types (Dictionary)
 import qualified Shikensu.Contrib.Pure as Pure
 
 

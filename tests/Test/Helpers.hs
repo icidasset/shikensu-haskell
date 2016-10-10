@@ -1,6 +1,7 @@
 module Test.Helpers where
 
-import Shikensu (Dictionary, sortByAbsolutePath)
+import Shikensu (sortByAbsolutePath)
+import Shikensu.Types (Dictionary)
 import System.Directory (canonicalizePath)
 import System.FilePath (combine)
 import Test.Tasty.HUnit (Assertion, assertEqual)
@@ -8,9 +9,8 @@ import Test.Tasty.HUnit (Assertion, assertEqual)
 import qualified Data.List as List
 
 
-assertDef :: (Show b, Eq b) => IO a -> (a -> b) -> b -> IO ()
-assertDef definition accessor value =
-  (fmap accessor definition) >>= (assertEq value)
+rmap :: Functor f => f a -> (a -> b) -> f b
+rmap = flip fmap
 
 
 assertEq :: (Eq a, Show a) => a -> a -> Assertion

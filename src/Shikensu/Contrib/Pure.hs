@@ -13,7 +13,7 @@ https://hackage.haskell.org/package/text-1.2.2.1/docs/Data-Text-Lazy-IO.html
 -}
 
 import Flow
-import Shikensu
+import Shikensu.Types
 
 import qualified Data.Text.Lazy as Text
 import qualified Data.Text.Lazy.IO as Text (readFile)

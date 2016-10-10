@@ -35,6 +35,8 @@ library
 
   exposed-modules:
     Shikensu,
+    Shikensu.Types,
+    Shikensu.Utilities,
     Shikensu.Contrib.IO,
     Shikensu.Contrib.Pure
 

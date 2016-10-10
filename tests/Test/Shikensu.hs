@@ -7,10 +7,13 @@ import Test.Tasty.HUnit
 
 import qualified Data.List as List (head)
 import qualified Shikensu
+import qualified Shikensu.Types as Shikensu
 
 
 shikensuTests :: TestTree
-shikensuTests = testGroup "Shikensu tests" [testRegular, testDot, testWithoutWd]
+shikensuTests = testGroup
+  "Shikensu tests"
+  [testRegular, testDot, testWithoutWd, testRootFile]
 
 
 
@@ -27,22 +30,22 @@ testRegular =
   in
     testGroup "Test regular"
       [ testCase "Should have the correct basename"
-        $ assertDef definition Shikensu.basename "example"
+        $ definition `rmap` Shikensu.basename >>= assertEq "example"
 
       , testCase "Should have the correct dirname"
-        $ assertDef definition Shikensu.dirname "fixtures"
+        $ definition `rmap` Shikensu.dirname >>= assertEq "fixtures"
 
       , testCase "Should have the correct extname"
-        $ assertDef definition Shikensu.extname ".md"
+        $ definition `rmap` Shikensu.extname >>= assertEq ".md"
 
       , testCase "Should have the correct localPath"
-        $ assertDef definition Shikensu.localPath localPath
+        $ definition `rmap` Shikensu.localPath >>= assertEq localPath
 
       , testCase "Should have the correct pattern"
-        $ assertDef definition Shikensu.pattern pattern
+        $ definition `rmap` Shikensu.pattern >>= assertEq pattern
 
       , testCase "Should have the correct workingDirectory"
-        $ assertDef definition Shikensu.workingDirectory "tests"
+        $ definition `rmap` Shikensu.workingDirectory >>= assertEq "tests"
 
       ]
 
@@ -57,22 +60,22 @@ testDot =
   in
     testGroup "Test dot"
       [ testCase "Should have the correct basename"
-        $ assertDef definition Shikensu.basename "example"
+        $ definition `rmap` Shikensu.basename >>= assertEq "example"
 
       , testCase "Should have the correct dirname"
-        $ assertDef definition Shikensu.dirname "fixtures"
+        $ definition `rmap` Shikensu.dirname >>= assertEq "fixtures"
 
       , testCase "Should have the correct extname"
-        $ assertDef definition Shikensu.extname ".md"
+        $ definition `rmap` Shikensu.extname >>= assertEq ".md"
 
       , testCase "Should have the correct localPath"
-        $ assertDef definition Shikensu.localPath localPath
+        $ definition `rmap` Shikensu.localPath >>= assertEq localPath
 
       , testCase "Should have the correct pattern"
-        $ assertDef definition Shikensu.pattern pattern
+        $ definition `rmap` Shikensu.pattern >>= assertEq pattern
 
       , testCase "Should have the correct workingDirectory"
-        $ assertDef definition Shikensu.workingDirectory "tests"
+        $ definition `rmap` Shikensu.workingDirectory >>= assertEq "tests"
 
       ]
 
@@ -87,21 +90,51 @@ testWithoutWd =
   in
     testGroup "Test without workingDirectory"
       [ testCase "Should have the correct basename"
-        $ assertDef definition Shikensu.basename "example"
+        $ definition `rmap` Shikensu.basename >>= assertEq "example"
 
       , testCase "Should have the correct dirname"
-        $ assertDef definition Shikensu.dirname "fixtures"
+        $ definition `rmap` Shikensu.dirname >>= assertEq "fixtures"
 
       , testCase "Should have the correct extname"
-        $ assertDef definition Shikensu.extname ".md"
+        $ definition `rmap` Shikensu.extname >>= assertEq ".md"
 
       , testCase "Should have the correct localPath"
-        $ assertDef definition Shikensu.localPath localPath
+        $ definition `rmap` Shikensu.localPath >>= assertEq localPath
 
       , testCase "Should have the correct pattern"
-        $ assertDef definition Shikensu.pattern pattern
+        $ definition `rmap` Shikensu.pattern >>= assertEq pattern
 
       , testCase "Should have the correct workingDirectory"
-        $ assertDef definition Shikensu.workingDirectory ""
+        $ definition `rmap` Shikensu.workingDirectory >>= assertEq ""
+
+      ]
+
+
+testRootFile :: TestTree
+testRootFile =
+  let
+    pattern = "*.md"
+    dictionary = fmap sort $ rootPath >>= Shikensu.list [pattern]
+    definition = fmap List.head dictionary
+    localPath = "README.md"
+  in
+    testGroup "Test file in root path"
+      [ testCase "Should have the correct basename"
+        $ definition `rmap` Shikensu.basename >>= assertEq "README"
+
+      , testCase "Should have the correct dirname"
+        $ definition `rmap` Shikensu.dirname >>= assertEq ""
+
+      , testCase "Should have the correct extname"
+        $ definition `rmap` Shikensu.extname >>= assertEq ".md"
+
+      , testCase "Should have the correct localPath"
+        $ definition `rmap` Shikensu.localPath >>= assertEq localPath
+
+      , testCase "Should have the correct pattern"
+        $ definition `rmap` Shikensu.pattern >>= assertEq pattern
+
+      , testCase "Should have the correct workingDirectory"
+        $ definition `rmap` Shikensu.workingDirectory >>= assertEq ""
 
       ]

@@ -7,6 +7,7 @@ import Test.Tasty.HUnit
 import qualified Data.List as List (head)
 import qualified Shikensu
 import qualified Shikensu.Contrib.IO as Contrib
+import qualified Shikensu.Types as Shikensu (content)
 
 
 contribTests :: TestTree

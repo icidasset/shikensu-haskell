@@ -6,8 +6,10 @@ module Shikensu where
 ## How to use
 
     import Shikensu (list)
+    import Shikensu.Types (Dictionary)
     import Shikensu.Contrib.IO (read, rename, write)
 
+    dictionary_io :: IO Dictionary
     dictionary_io =
       Shikensu.list ["**/*.html"] absolute_path
 
@@ -16,78 +18,16 @@ module Shikensu where
       |> rename "main.html" "index.html"
       |> write "./build"
 
-
-## Additional info
-
-The code in this module is written in order of importance.
-That is:
-
-1. Records and types
-2. Functions you will use all the time
-3. Functions you will sometimes use
-4. Functions you will seldom use
-5. ...
-
 -}
 
-import Debug.Trace
 import Flow
-
-import Data.Map.Lazy (Map)
-import Data.Maybe (fromJust, fromMaybe)
-import Data.String
-import Data.Tuple (fst, snd)
+import Shikensu.Types
+import Shikensu.Utilities
 import System.FilePath
 
-import qualified Data.List as List
-import qualified Data.Map.Lazy as Map
-import qualified System.FilePath.Glob as Glob
+import qualified Data.List as List (concat, map, zip)
+import qualified Data.Map.Lazy as Map (empty)
 
-
-{-| A file definition, along with some additional properties.
--}
-data Definition =
-  Definition
-    { absolutePath :: FilePath
-    , basename :: String
-    , dirname :: FilePath
-    , extname :: String
-    , localPath :: FilePath
-    , pattern :: Pattern
-    , rootPath :: FilePath
-    , workingDirectory :: FilePath
-
-    -- Additional properties
-    , content :: IO String
-    , metadata :: Map String String
-    , parentPath :: Maybe FilePath
-    , pathToRoot :: FilePath
-    }
-
-
-{-| Definition dependencies.
-
-A set of properties all definitions from a `Dictionary` produced
-by `makeDictionary` have in common.
-
--}
-data Dependencies =
-  Dependencies
-    { _pattern :: String
-    , _rootPath :: FilePath
-    }
-
-
-
--- Type aliases
-
-
-type Dictionary = [Definition]
-type Pattern = String
-
-
-
--- Main functions
 
 
 {-| Make a single dictionary based on multiple glob patterns and a path to a directory.
@@ -111,19 +51,6 @@ list patterns rootPath =
 
 
 
--- Sorting functions
---   (e.g. `List.sortBy Shikensu.sortByAbsolutePath dictionary`)
-
-
-sortByAbsolutePath :: Definition -> Definition -> Ordering
-sortByAbsolutePath defA defB =
-  compare (absolutePath defA) (absolutePath defB)
-
-
-
--- Definitions & Dictionary functions
-
-
 {-| Make a Definition.
 
 Example definition, given:
@@ -141,7 +68,7 @@ Example definition, given:
       , rootPath = "/Users/icidasset/Projects/shikensu"
       , workingDirectory = "example"
 
-      , content = Nothing
+      , content = IO ""
       , metadata = Map.empty
       , parentPath = "../"
       , pathToRoot = "../../"
@@ -153,15 +80,15 @@ makeDefinition deps absPath =
   let
     pattern         = _pattern deps
     rootPath        = _rootPath deps
-    absPath'        = normalise absPath
 
     -- The following assumes that absPath and rootPath have a format of `/a/b/c(/)`
     -- (ie. for POSIX systems)
 
-    workingDir      = (cleanPath <. fst) (Glob.commonDirectory (Glob.compile pattern))
-    absWorkingDir   = (joinPath) [rootPath, workingDir]
-    localPath       = (cleanPath) (stripPrefix absWorkingDir absPath')
-    dirname         = (takeDirectory .> replaceSingleDot) localPath
+    absPath'        = normalise absPath
+    workingDir      = cleanPath (commonDirectory pattern)
+    absWorkingDir   = joinPath [rootPath, workingDir]
+    localPath       = cleanPath (stripPrefix absWorkingDir absPath')
+    dirname         = replaceSingleDot (takeDirectory localPath)
   in
     Definition
       { absolutePath = absPath'
@@ -181,6 +108,7 @@ makeDefinition deps absPath =
       }
 
 
+
 {-| Make a Dictionary
 -}
 makeDictionary :: FilePath -> (Pattern, [FilePath]) -> Dictionary
@@ -194,71 +122,11 @@ makeDictionary rootPath patternAndFileList =
 
 
 
--- Utility functions
+
+-- Sorting functions
+--   (e.g. `Data.List.sortBy Shikensu.sortByAbsolutePath dictionary`)
 
 
-cleanPath :: FilePath -> FilePath
-cleanPath = normalise .> dropTrailingPathSeparator .> dropDrive .> replaceSingleDot
-
-
-compilePatterns :: [Pattern] -> [Glob.Pattern]
-compilePatterns = List.map Glob.compile
-
-
-{-| Path to parent, when there is one.
-
-    Just "../" or Nothing
-
--}
-compileParentPath :: FilePath -> Maybe FilePath
-compileParentPath dirname =
-  case dirname of
-    "" -> Nothing
-    _  -> Just "../"
-
-
-{-| Path to root.
-
-Example, if `dirname` is 'example/subdir',
-then this will be `../../`.
-
-If the `dirname` is empty,
-then this will be empty as well.
-
--}
-compilePathToRoot :: FilePath -> FilePath
-compilePathToRoot dirname =
-  if dirname == "" then
-    ""
-  else
-    dirname
-      |> splitDirectories
-      |> fmap (\_ -> "..")
-      |> joinPath
-      |> addTrailingPathSeparator
-
-
-{-| No content.
--}
-emptyContent :: IO String
-emptyContent = return ""
-
-
-{-| List contents of a directory using a glob pattern.
--}
-globDir :: FilePath -> [Glob.Pattern] -> IO [[FilePath]]
-globDir a b = fmap fst (Glob.globDir b a)
-
-
-{-| If the path is a single dot, return an empty string.
-Otherwise return the path.
--}
-replaceSingleDot :: String -> String
-replaceSingleDot path =
-  if path == "." then "" else path
-
-
-{-| Strip prefix
--}
-stripPrefix :: String -> String -> String
-stripPrefix prefix target = fromMaybe target (List.stripPrefix prefix target)
+sortByAbsolutePath :: Definition -> Definition -> Ordering
+sortByAbsolutePath defA defB =
+  compare (absolutePath defA) (absolutePath defB)
