@@ -15,7 +15,7 @@ data Definition =
     , workingDirectory :: FilePath
 
     -- Additional properties
-    , content :: IO String
+    , content :: Maybe String
     , metadata :: Map String String
     , parentPath :: Maybe FilePath
     , pathToRoot :: FilePath

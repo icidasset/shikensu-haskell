@@ -9,7 +9,7 @@ import qualified Data.List as List (head)
 import qualified Data.Text.Lazy as Text (unpack)
 import qualified Data.Text.Lazy.IO as Text (readFile)
 import qualified Shikensu
-import qualified Shikensu.Contrib.IO as Contrib
+import qualified Shikensu.Contrib as Contrib
 import qualified Shikensu.Types as Shikensu (content, rootPath)
 
 
@@ -29,13 +29,13 @@ testRead =
     definition = fmap List.head dictionary
   in
     testCase "Should `read`"
-      $ definition >>= Shikensu.content >>= assertEq "# Example\n"
+      $ definition `rmap` Shikensu.content >>= assertEq (Just "# Example\n")
 
 
 testWrite :: TestTree
 testWrite =
   let
-    list = rootPath >>= Shikensu.list ["tests/**/example.md"]
+    list = Contrib.read (rootPath >>= Shikensu.list ["tests/**/example.md"])
     destination = "tests/build/"
     dictionary = Contrib.write destination list
     definition = fmap List.head dictionary

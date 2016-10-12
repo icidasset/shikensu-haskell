@@ -7,7 +7,7 @@ module Shikensu where
 
     import Shikensu (list)
     import Shikensu.Types (Dictionary)
-    import Shikensu.Contrib.IO (read, rename, write)
+    import Shikensu.Contrib (read, rename, write)
 
     dictionary_io :: IO Dictionary
     dictionary_io =
@@ -66,7 +66,7 @@ Example definition, given:
       , rootPath = "/Users/icidasset/Projects/shikensu"
       , workingDirectory = "example"
 
-      , content = IO ""
+      , content = Nothing
       , metadata = Map.empty
       , parentPath = "../"
       , pathToRoot = "../../"
@@ -97,7 +97,7 @@ makeDefinition deps absPath =
       , workingDirectory = workingDir
 
       -- Additional properties
-      , content = emptyContent
+      , content = Nothing
       , metadata = Map.empty
       , parentPath = compileParentPath dirname
       , pathToRoot = compilePathToRoot dirname
@@ -108,13 +108,8 @@ makeDefinition deps absPath =
 {-| Make a Dictionary
 -}
 makeDictionary :: FilePath -> (Pattern, [FilePath]) -> Dictionary
-makeDictionary rootPath patternAndFileList =
-  let
-    pattern = fst patternAndFileList
-    fileList = snd patternAndFileList
-    deps = Dependencies { _pattern = pattern, _rootPath = rootPath }
-  in
-    map (makeDefinition deps) fileList
+makeDictionary rootPath (pattern, files) =
+  makeDefinition Dependencies { _pattern = pattern, _rootPath = rootPath } <$> files
 
 
 
@@ -124,12 +119,12 @@ makeDictionary rootPath patternAndFileList =
 
 absolutePath :: Definition -> String
 absolutePath def =
-  joinPath [rootPath def, localPath def]
+  joinPath [rootPath def, workingDirectory def, localPath def]
 
 
 localPath :: Definition -> String
 localPath def =
-  joinPath [workingDirectory def, dirname def, (basename def) ++ (extname def)]
+  joinPath [dirname def, (basename def) ++ (extname def)]
 
 
 

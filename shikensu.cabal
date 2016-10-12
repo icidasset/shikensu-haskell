@@ -37,8 +37,7 @@ library
     Shikensu,
     Shikensu.Types,
     Shikensu.Utilities,
-    Shikensu.Contrib.IO,
-    Shikensu.Contrib.Pure
+    Shikensu.Contrib
 
   build-depends:
     base == 4.*,

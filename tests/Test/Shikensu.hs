@@ -26,7 +26,7 @@ testRegular =
     pattern = "tests/**/*.md"
     dictionary = fmap sort $ rootPath >>= Shikensu.list [pattern]
     definition = fmap List.head dictionary
-    localPath = "tests/fixtures/example.md"
+    localPath = "fixtures/example.md"
   in
     testGroup "Test regular"
       [ testCase "Should have the correct basename"
@@ -56,7 +56,7 @@ testDot =
     pattern = "./tests/**/*.md"
     dictionary = fmap sort $ rootPath >>= Shikensu.list [pattern]
     definition = fmap List.head dictionary
-    localPath = "tests/fixtures/example.md"
+    localPath = "fixtures/example.md"
   in
     testGroup "Test dot"
       [ testCase "Should have the correct basename"

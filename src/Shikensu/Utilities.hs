@@ -66,12 +66,6 @@ compilePathToRoot dirname =
       |> addTrailingPathSeparator
 
 
-{-| No content.
--}
-emptyContent :: IO String
-emptyContent = return ""
-
-
 {-| List contents of a directory using a glob pattern.
 -}
 globDir :: FilePath -> [Glob.Pattern] -> IO [[FilePath]]
