@@ -36,8 +36,10 @@ library
   exposed-modules:
     Shikensu,
     Shikensu.Types,
-    Shikensu.Utilities,
     Shikensu.Contrib
+
+  other-modules:
+    Shikensu.Utilities
 
   build-depends:
     base == 4.*,

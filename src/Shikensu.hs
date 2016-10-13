@@ -51,6 +51,30 @@ list patterns rootPath =
 
 
 
+{-| Fork a Definition.
+-}
+forkDefinition :: FilePath -> Definition -> Definition
+forkDefinition newLocalPath def =
+  let
+    dirname = replaceSingleDot (takeDirectory newLocalPath)
+  in
+    Definition
+      { basename = takeBaseName newLocalPath
+      , dirname = dirname
+      , extname = takeExtension newLocalPath
+      , pattern = (pattern def)
+      , rootPath = (rootPath def)
+      , workingDirectory = (workingDirectory def)
+
+      -- Additional properties
+      , content = (content def)
+      , metadata = (metadata def)
+      , parentPath = compileParentPath dirname
+      , pathToRoot = compilePathToRoot dirname
+      }
+
+
+
 {-| Make a Definition.
 
 Example definition, given:

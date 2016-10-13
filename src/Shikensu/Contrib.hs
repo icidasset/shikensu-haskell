@@ -5,7 +5,7 @@ module Shikensu.Contrib (
 
 import Data.Maybe (fromMaybe)
 import Flow
-import Shikensu (absolutePath, localPath)
+import Shikensu (absolutePath, forkDefinition, localPath)
 import Shikensu.Types
 import System.Directory (createDirectoryIfMissing)
 import System.FilePath (FilePath, combine, takeDirectory)
@@ -18,7 +18,7 @@ import qualified Data.Text.Lazy.IO as Text (readFile, writeFile)
 {-| Read
 -}
 read :: IO Dictionary -> IO Dictionary
-read a = a >>= read_
+read = flip (>>=) $ read_
 
 
 read_ :: Dictionary -> IO Dictionary
@@ -32,11 +32,27 @@ read_ dict =
     |> sequence
 
 
+{-| Rename
+-}
+rename :: FilePath -> FilePath -> IO Dictionary -> IO Dictionary
+rename a b dict = fmap (rename_ a b) dict
+
+
+rename_ :: FilePath -> FilePath -> Dictionary -> Dictionary
+rename_ oldPath newPath dict =
+  List.map
+    (\def ->
+      if (localPath def) == oldPath
+        then forkDefinition newPath def
+        else def
+    )
+    dict
+
 
 {-| Write
 -}
 write :: FilePath -> IO Dictionary -> IO Dictionary
-write a b = b >>= write_ a
+write dest dict = dict >>= write_ dest
 
 
 write_ :: FilePath -> Dictionary -> IO Dictionary
