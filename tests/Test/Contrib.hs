@@ -15,7 +15,7 @@ import qualified Shikensu.Types as Shikensu (content, rootPath)
 
 
 contribTests :: TestTree
-contribTests = testGroup "Contrib tests" [testRead, testWrite]
+contribTests = testGroup "Contrib tests" [testRead, testRename, testWrite]
 
 
 
@@ -31,6 +31,17 @@ testRead =
   in
     testCase "Should `read`"
       $ definition `rmap` Shikensu.content >>= assertEq (Just "# Example\n")
+
+
+testRename :: TestTree
+testRename =
+  let
+    list = rootPath >>= Shikensu.list ["tests/fixtures/example.md"]
+    dictionary = Contrib.rename "example.md" "renamed.md" list
+    definition = fmap List.head dictionary
+  in
+    testCase "Should `rename`"
+      $ definition `rmap` Shikensu.localPath >>= assertEq "renamed.md"
 
 
 testWrite :: TestTree

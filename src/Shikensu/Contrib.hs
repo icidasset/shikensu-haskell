@@ -6,55 +6,54 @@ import Shikensu (absolutePath, forkDefinition, localPath)
 import Shikensu.Types
 import Shikensu.Utilities ((<&>), rmap)
 import System.Directory (createDirectoryIfMissing)
-import System.FilePath (FilePath, combine, takeDirectory)
+import System.FilePath (FilePath, joinPath, takeDirectory)
 
 import qualified Data.List as List
 import qualified Data.Text.Lazy as Text
 import qualified Data.Text.Lazy.IO as Text (readFile, writeFile)
+import qualified Shikensu (io, mapIO, mapPure, pure)
 
 
 {-| Read
 -}
 read :: IO Dictionary -> IO Dictionary
-read = (=<<) $ List.map (readDef) .> sequence
-
-
-readDef :: Definition -> IO Definition
-readDef def =
+read =
   let
-    doRead  = Text.readFile $ absolutePath def
-    doStore = \c -> def { content = Just (Text.unpack c) }
+    fn = \def ->
+      fmap
+        (\c -> def { content = Just (Text.unpack c) })
+        (Text.readFile $ absolutePath def)
   in
-    doRead <&> doStore
+    Shikensu.mapIO fn
+
 
 
 {-| Rename
 -}
 rename :: FilePath -> FilePath -> IO Dictionary -> IO Dictionary
-rename oldPath newPath = fmap $ List.map (renameDef oldPath newPath)
+rename oldPath newPath =
+  let
+    fn = \def ->
+      if (localPath def) == oldPath
+        then forkDefinition newPath def
+        else def
+  in
+    Shikensu.mapPure fn
 
-
-renameDef :: FilePath -> FilePath -> Definition -> Definition
-renameDef oldPath newPath def =
-  if (localPath def) == oldPath
-    then forkDefinition newPath def
-    else def
 
 
 {-| Write
 -}
 write :: FilePath -> IO Dictionary -> IO Dictionary
-write destination = (=<<) $ List.map (writeDef destination) .> sequence
-
-
-writeDef :: FilePath -> Definition -> IO Definition
-writeDef destination def =
+write dest =
   let
-    destination'    = combine (rootPath def) destination
-    finalFilePath   = combine destination' (localPath def)
-    content'        = fromMaybe "" (content def)
-
-    createDirIO     = createDirectoryIfMissing True (takeDirectory finalFilePath)
-    writeFileIO     = Text.writeFile finalFilePath (Text.pack content')
+    fn = \def ->
+      let
+        path = joinPath [rootPath def, dest, localPath def]
+        cont = fromMaybe "" $ content def
+      in
+        createDirectoryIfMissing True (takeDirectory path)
+        >> Text.writeFile path (Text.pack cont)
+        >> return def
   in
-    createDirIO >> writeFileIO >> (return def)
+    Shikensu.mapIO fn

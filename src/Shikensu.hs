@@ -6,17 +6,42 @@ module Shikensu where
 ## How to use
 
     import Shikensu (list)
-    import Shikensu.Types (Dictionary)
+    import Shikensu.Types (Definition, Dictionary)
     import Shikensu.Contrib (read, rename, write)
 
     dictionary_io :: IO Dictionary
     dictionary_io =
       Shikensu.list ["**/*.html"] absolute_path
 
+
     dictionary_io
       |> read
       |> rename "main.html" "index.html"
       |> write "./build"
+
+
+    dictionary_io
+      |> Shikensu.io a
+      |> Shikensu.pure b
+
+      -- which is basically
+
+      |> (=<<) (sequence . a)
+      |> fmap b
+
+
+    -- Where a :: [Definition] -> [IO Definition]
+    --       b :: [Definition] -> [Definition]
+    --
+    -- type alias Dictionary = [Definition]
+
+
+    dictionary_io
+      |> Shikensu.mapIO x
+      |> Shikensu.mapPure y
+
+    -- Where x :: Definition -> IO Definition
+    --       y :: Definition -> Definition
 
 -}
 
@@ -129,11 +154,33 @@ makeDefinition deps absPath =
 
 
 
-{-| Make a Dictionary
+{-| Make a Dictionary.
 -}
 makeDictionary :: FilePath -> (Pattern, [FilePath]) -> Dictionary
 makeDictionary rootPath (pattern, files) =
   makeDefinition Dependencies { _pattern = pattern, _rootPath = rootPath } <$> files
+
+
+
+
+-- Sequence functions
+--   (See the documentation above and the Contrib module for more info)
+
+
+io :: ([Definition] -> [IO Definition]) -> IO Dictionary -> IO Dictionary
+io fn = (=<<) (sequence . fn)
+
+
+pure :: ([Definition] -> [Definition]) -> IO Dictionary -> IO Dictionary
+pure fn = (<$>) (fn)
+
+
+mapIO :: (Definition -> IO Definition) -> IO Dictionary -> IO Dictionary
+mapIO = (Shikensu.io . List.map)
+
+
+mapPure :: (Definition -> Definition) -> IO Dictionary -> IO Dictionary
+mapPure = (Shikensu.pure . List.map)
 
 
 
