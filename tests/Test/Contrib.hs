@@ -1,5 +1,6 @@
 module Test.Contrib (contribTests) where
 
+import Shikensu.Utilities ((<&>), rmap)
 import System.FilePath (joinPath)
 import Test.Helpers
 import Test.Tasty

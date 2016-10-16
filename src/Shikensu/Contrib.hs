@@ -1,12 +1,10 @@
-module Shikensu.Contrib (
-    Shikensu.Contrib.read
-  , Shikensu.Contrib.write
-  ) where
+module Shikensu.Contrib where
 
 import Data.Maybe (fromMaybe)
 import Flow
 import Shikensu (absolutePath, forkDefinition, localPath)
 import Shikensu.Types
+import Shikensu.Utilities ((<&>), rmap)
 import System.Directory (createDirectoryIfMissing)
 import System.FilePath (FilePath, combine, takeDirectory)
 
@@ -18,55 +16,45 @@ import qualified Data.Text.Lazy.IO as Text (readFile, writeFile)
 {-| Read
 -}
 read :: IO Dictionary -> IO Dictionary
-read = flip (>>=) $ read_
+read = (=<<) $ List.map (readDef) .> sequence
 
 
-read_ :: Dictionary -> IO Dictionary
-read_ dict =
-  dict
-    |> List.map (\def ->
-        fmap
-          (\c -> def { content = Just (Text.unpack c) })
-          (Text.readFile $ absolutePath def)
-       )
-    |> sequence
+readDef :: Definition -> IO Definition
+readDef def =
+  let
+    doRead  = Text.readFile $ absolutePath def
+    doStore = \c -> def { content = Just (Text.unpack c) }
+  in
+    doRead <&> doStore
 
 
 {-| Rename
 -}
 rename :: FilePath -> FilePath -> IO Dictionary -> IO Dictionary
-rename a b dict = fmap (rename_ a b) dict
+rename oldPath newPath = fmap $ List.map (renameDef oldPath newPath)
 
 
-rename_ :: FilePath -> FilePath -> Dictionary -> Dictionary
-rename_ oldPath newPath dict =
-  List.map
-    (\def ->
-      if (localPath def) == oldPath
-        then forkDefinition newPath def
-        else def
-    )
-    dict
+renameDef :: FilePath -> FilePath -> Definition -> Definition
+renameDef oldPath newPath def =
+  if (localPath def) == oldPath
+    then forkDefinition newPath def
+    else def
 
 
 {-| Write
 -}
 write :: FilePath -> IO Dictionary -> IO Dictionary
-write dest dict = dict >>= write_ dest
+write destination = (=<<) $ List.map (writeDef destination) .> sequence
 
 
-write_ :: FilePath -> Dictionary -> IO Dictionary
-write_ destination dict =
-  dict
-    |> List.map (\def ->
-        let
-          destination'    = combine (rootPath def) destination
-          finalFilePath   = combine destination' (localPath def)
-          content'        = fromMaybe "" (content def)
+writeDef :: FilePath -> Definition -> IO Definition
+writeDef destination def =
+  let
+    destination'    = combine (rootPath def) destination
+    finalFilePath   = combine destination' (localPath def)
+    content'        = fromMaybe "" (content def)
 
-          createDirIO     = createDirectoryIfMissing True (takeDirectory finalFilePath)
-          writeFileIO     = Text.writeFile finalFilePath (Text.pack content')
-        in
-          fmap (\() -> def) (createDirIO >> writeFileIO)
-       )
-    |> sequence
+    createDirIO     = createDirectoryIfMissing True (takeDirectory finalFilePath)
+    writeFileIO     = Text.writeFile finalFilePath (Text.pack content')
+  in
+    createDirIO >> writeFileIO >> (return def)

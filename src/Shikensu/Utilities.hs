@@ -10,6 +10,16 @@ import qualified Data.List as List (map, stripPrefix)
 import qualified System.FilePath.Glob as Glob
 
 
+{-| Flipped fmap.
+-}
+(<&>) :: Functor f => f a -> (a -> b) -> f b
+(<&>) = flip fmap
+
+
+rmap :: Functor f => f a -> (a -> b) -> f b
+rmap = (<&>)
+
+
 {-| "Clean up" a path.
 
 `/directory/./nested/` -> `directory/nested`

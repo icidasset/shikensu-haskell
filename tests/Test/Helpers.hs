@@ -9,14 +9,6 @@ import Test.Tasty.HUnit (Assertion, assertEqual)
 import qualified Data.List as List
 
 
-(<&>) :: Functor f => f a -> (a -> b) -> f b
-(<&>) = flip fmap
-
-
-rmap :: Functor f => f a -> (a -> b) -> f b
-rmap = flip fmap
-
-
 assertEq :: (Eq a, Show a) => a -> a -> Assertion
 assertEq = assertEqual ""
 
