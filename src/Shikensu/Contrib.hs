@@ -14,6 +14,23 @@ import qualified Data.Text.Lazy.IO as Text (readFile, writeFile)
 import qualified Shikensu (io, mapIO, mapPure, pure)
 
 
+{-| Clone
+-}
+clone :: FilePath -> FilePath -> IO Dictionary -> IO Dictionary
+clone existingPath newPath =
+  let
+    fn = \dict ->
+      let
+        makeNew = \def acc ->
+          if (localPath def) == existingPath
+            then acc ++ [forkDefinition newPath def]
+            else acc
+      in
+        dict ++ (foldr makeNew [] dict)
+  in
+    Shikensu.pure fn
+
+
 {-| Read
 -}
 read :: IO Dictionary -> IO Dictionary

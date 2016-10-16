@@ -6,7 +6,7 @@ import Test.Helpers
 import Test.Tasty
 import Test.Tasty.HUnit
 
-import qualified Data.List as List (head)
+import qualified Data.List as List (head, reverse)
 import qualified Data.Text.Lazy as Text (unpack)
 import qualified Data.Text.Lazy.IO as Text (readFile)
 import qualified Shikensu
@@ -15,11 +15,22 @@ import qualified Shikensu.Types as Shikensu (content, rootPath)
 
 
 contribTests :: TestTree
-contribTests = testGroup "Contrib tests" [testRead, testRename, testWrite]
+contribTests = testGroup "Contrib tests" [testClone, testRead, testRename, testWrite]
 
 
 
 -- Tests
+
+
+testClone :: TestTree
+testClone =
+  let
+    list = rootPath >>= Shikensu.list ["tests/fixtures/example.md"]
+    dictionary = Contrib.clone "example.md" "cloned.md" list
+    definition = fmap (List.head . List.reverse) dictionary
+  in
+    testCase "Should `clone`"
+      $ definition `rmap` Shikensu.localPath >>= assertEq "cloned.md"
 
 
 testRead :: TestTree
