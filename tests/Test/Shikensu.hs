@@ -1,6 +1,6 @@
 module Test.Shikensu (shikensuTests) where
 
-import Shikensu.Utilities ((<&>), rmap)
+import Shikensu.Utilities (rmap)
 import Test.Helpers
 import Test.Tasty
 import Test.Tasty.HUnit

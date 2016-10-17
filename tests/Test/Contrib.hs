@@ -7,7 +7,7 @@ import Test.Tasty
 import Test.Tasty.HUnit
 
 import qualified Data.List as List (head, reverse)
-import qualified Data.Map.Lazy as Map (findWithDefault, fromList, lookup)
+import qualified Data.Map.Lazy as Map (fromList, lookup)
 import qualified Data.Text.Lazy as Text (unpack)
 import qualified Data.Text.Lazy.IO as Text (readFile)
 import qualified Shikensu
@@ -59,8 +59,8 @@ testMetadata :: TestTree
 testMetadata =
   let
     testData = [
-        ("title", Shikensu.MetaStr "Hello world!")
-      , ("order", Shikensu.MetaInt 1)
+        ("title", "Hello world!")
+      , ("order", "1")
       ]
 
     dictionary = Contrib.insertMetadata (Map.fromList testData) example_md
@@ -69,7 +69,7 @@ testMetadata =
     lookupTitle = \def -> Map.lookup "title" (Shikensu.metadata def)
   in
     testCase "Should `metadata`"
-      $ definition `rmap` lookupTitle >>= assertEq (Just (Shikensu.MetaStr "Hello world!"))
+      $ definition `rmap` lookupTitle >>= assertEq (Just "Hello world!")
 
 
 

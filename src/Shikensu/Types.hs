@@ -35,20 +35,11 @@ data Dependencies =
     }
 
 
-{-| Metadata value.
--}
-data Metavalue =
-    MetaInt Integer
-  | MetaDbl Double
-  | MetaStr String
-  deriving (Eq, Show)
-
-
 
 
 -- Type aliases
 
 
 type Dictionary = [Definition]
-type Metadata = Map String Metavalue
+type Metadata = Map String String
 type Pattern = String
