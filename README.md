@@ -3,9 +3,8 @@ __Work in progress__.
 
 ## TODO
 
-- frontmatter?
-- metadata
-- templates
+- `frontmatter` (maybe?)
+- `templates`
 
-- Support binary data (content)
-- String -> Text
+- Support binary data (`content` property)
+- String -> Text (maybe?)
