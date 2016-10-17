@@ -7,15 +7,37 @@ import Test.Tasty
 import Test.Tasty.HUnit
 
 import qualified Data.List as List (head, reverse)
+import qualified Data.Map.Lazy as Map (findWithDefault, fromList, lookup)
 import qualified Data.Text.Lazy as Text (unpack)
 import qualified Data.Text.Lazy.IO as Text (readFile)
 import qualified Shikensu
 import qualified Shikensu.Contrib as Contrib
-import qualified Shikensu.Types as Shikensu (content, rootPath)
+import qualified Shikensu.Types as Shikensu
 
 
 contribTests :: TestTree
-contribTests = testGroup "Contrib tests" [testClone, testRead, testRename, testWrite]
+contribTests = testGroup
+  "Contrib tests"
+  [ testClone
+  , testMetadata
+  , testPermalink
+  , testRead
+  , testRename
+  , testRenameExt
+  , testWrite
+  ]
+
+
+
+-- Test data
+
+
+list :: Shikensu.Pattern -> IO Shikensu.Dictionary
+list pattern = rootPath >>= Shikensu.list [pattern]
+
+
+example_md :: IO Shikensu.Dictionary
+example_md = list "tests/fixtures/example.md"
 
 
 
@@ -25,42 +47,81 @@ contribTests = testGroup "Contrib tests" [testClone, testRead, testRename, testW
 testClone :: TestTree
 testClone =
   let
-    list = rootPath >>= Shikensu.list ["tests/fixtures/example.md"]
-    dictionary = Contrib.clone "example.md" "cloned.md" list
+    dictionary = Contrib.clone "example.md" "cloned.md" example_md
     definition = fmap (List.head . List.reverse) dictionary
   in
     testCase "Should `clone`"
       $ definition `rmap` Shikensu.localPath >>= assertEq "cloned.md"
 
 
+
+testMetadata :: TestTree
+testMetadata =
+  let
+    testData = [
+        ("title", Shikensu.MetaStr "Hello world!")
+      , ("order", Shikensu.MetaInt 1)
+      ]
+
+    dictionary = Contrib.insertMetadata (Map.fromList testData) example_md
+    definition = fmap (List.head . List.reverse) dictionary
+
+    lookupTitle = \def -> Map.lookup "title" (Shikensu.metadata def)
+  in
+    testCase "Should `metadata`"
+      $ definition `rmap` lookupTitle >>= assertEq (Just (Shikensu.MetaStr "Hello world!"))
+
+
+
+testPermalink :: TestTree
+testPermalink =
+  let
+    dictionary = Contrib.permalink "index" example_md
+    definition = fmap List.head dictionary
+  in
+    testCase "Should `permalink`"
+      $ definition `rmap` Shikensu.localPath >>= assertEq "example/index.md"
+
+
+
 testRead :: TestTree
 testRead =
   let
-    list = rootPath >>= Shikensu.list ["tests/fixtures/example.md"]
-    dictionary = Contrib.read list
+    dictionary = Contrib.read example_md
     definition = fmap List.head dictionary
   in
     testCase "Should `read`"
       $ definition `rmap` Shikensu.content >>= assertEq (Just "# Example\n")
 
 
+
 testRename :: TestTree
 testRename =
   let
-    list = rootPath >>= Shikensu.list ["tests/fixtures/example.md"]
-    dictionary = Contrib.rename "example.md" "renamed.md" list
+    dictionary = Contrib.rename "example.md" "renamed.md" example_md
     definition = fmap List.head dictionary
   in
     testCase "Should `rename`"
       $ definition `rmap` Shikensu.localPath >>= assertEq "renamed.md"
 
 
+
+testRenameExt :: TestTree
+testRenameExt =
+  let
+    dictionary = Contrib.renameExt ".md" ".html" example_md
+    definition = fmap List.head dictionary
+  in
+    testCase "Should `renameExt`"
+      $ definition `rmap` Shikensu.extname >>= assertEq ".html"
+
+
+
 testWrite :: TestTree
 testWrite =
   let
-    list = Contrib.read (rootPath >>= Shikensu.list ["tests/**/example.md"])
     destination = "tests/build/"
-    dictionary = Contrib.write destination list
+    dictionary = Contrib.write destination $ (Contrib.read . list) "tests/**/example.md"
     definition = fmap List.head dictionary
   in
     testCase "Should `write`"

@@ -16,7 +16,7 @@ data Definition =
 
     -- Additional properties
     , content :: Maybe String
-    , metadata :: Map String String
+    , metadata :: Metadata
     , parentPath :: Maybe FilePath
     , pathToRoot :: FilePath
     }
@@ -35,10 +35,20 @@ data Dependencies =
     }
 
 
+{-| Metadata value.
+-}
+data Metavalue =
+    MetaInt Integer
+  | MetaDbl Double
+  | MetaStr String
+  deriving (Eq, Show)
+
+
 
 
 -- Type aliases
 
 
 type Dictionary = [Definition]
+type Metadata = Map String Metavalue
 type Pattern = String
