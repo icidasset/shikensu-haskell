@@ -1,4 +1,10 @@
-module Test.Helpers where
+module Test.Helpers
+  ( assertEq
+  , ioErrorHandler
+  , rootPath
+  , sort
+  , testsPath
+  ) where
 
 import Shikensu (sortByAbsolutePath)
 import Shikensu.Types (Dictionary)

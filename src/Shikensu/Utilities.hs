@@ -1,4 +1,16 @@
-module Shikensu.Utilities where
+module Shikensu.Utilities
+  ( (<&>)
+  , rmap
+
+  , cleanPath
+  , commonDirectory
+  , compilePatterns
+  , compileParentPath
+  , compilePathToRoot
+  , globDir
+  , replaceSingleDot
+  , stripPrefix
+  ) where
 
 import Data.Maybe (fromMaybe)
 import Data.Tuple (fst)

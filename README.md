@@ -1,8 +1,13 @@
+# Shikensu
+
 __Work in progress__.
 
-__Todo:__
 
-- `frontmatter` (maybe?)
-- `templates`
+
+### To do
+
+- `workspacePath`, `workingDirectory + localPath`
+- `exclude "src/example.html"`, which removes definitions from the list
+- Write more documentation
 - Support binary data (`content` property)
-- String -> Text (maybe?)
+- Test on Windows and other systems

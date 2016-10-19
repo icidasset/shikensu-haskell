@@ -1,4 +1,16 @@
-module Shikensu where
+module Shikensu
+  ( list
+  , forkDefinition
+  , makeDefinition
+  , makeDictionary
+  , Shikensu.io
+  , Shikensu.pure
+  , mapIO
+  , mapPure
+  , absolutePath
+  , localPath
+  , sortByAbsolutePath
+  ) where
 
 
 {-| Shikensu.

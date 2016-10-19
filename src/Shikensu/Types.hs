@@ -1,6 +1,7 @@
 module Shikensu.Types where
 
 import Data.Map.Lazy (Map)
+import Data.Text.Lazy (Text)
 
 
 {-| A file definition, along with some additional properties.
@@ -15,7 +16,7 @@ data Definition =
     , workingDirectory :: FilePath
 
     -- Additional properties
-    , content :: Maybe String
+    , content :: Maybe Text
     , metadata :: Metadata
     , parentPath :: Maybe FilePath
     , pathToRoot :: FilePath

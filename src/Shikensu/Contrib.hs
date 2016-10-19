@@ -1,16 +1,32 @@
-module Shikensu.Contrib where
+module Shikensu.Contrib
+  ( clone
+  , insertMetadata
+  , insertMetadataDef
+  , permalink
+  , permalinkDef
+  , Shikensu.Contrib.read
+  , readDef
+  , rename
+  , renameDef
+  , renameExt
+  , renameExtDef
+  , renderContent
+  , renderContentDef
+  , Shikensu.Contrib.write
+  , writeDef
+  ) where
 
 import Data.Maybe (fromMaybe)
+import Data.Text.Lazy (Text)
 import Flow
 import Shikensu (absolutePath, forkDefinition, localPath)
 import Shikensu.Types
-import Shikensu.Utilities ((<&>), cleanPath, rmap)
+import Shikensu.Utilities (cleanPath)
 import System.Directory (createDirectoryIfMissing)
 import System.FilePath (FilePath, combine, joinPath, takeDirectory)
 
-import qualified Data.List as List
 import qualified Data.Map.Lazy as Map (union)
-import qualified Data.Text.Lazy as Text
+import qualified Data.Text.Lazy as Text (pack)
 import qualified Data.Text.Lazy.IO as Text (readFile, writeFile)
 import qualified Shikensu (io, mapIO, mapPure, pure)
 
@@ -73,7 +89,7 @@ read = Shikensu.mapIO (readDef)
 readDef :: Definition -> IO Definition
 readDef def =
   fmap
-    (\c -> def { content = Just (Text.unpack c) })
+    (\c -> def { content = Just c })
     (Text.readFile $ absolutePath def)
 
 
@@ -106,6 +122,17 @@ renameExtDef oldExtname newExtname def =
 
 
 
+{-| Render content
+-}
+renderContent :: (Definition -> Maybe Text) -> IO Dictionary -> IO Dictionary
+renderContent a = Shikensu.mapPure (renderContentDef a)
+
+
+renderContentDef :: (Definition -> Maybe Text) -> Definition -> Definition
+renderContentDef renderer def = def { content = renderer def }
+
+
+
 {-| Write
 -}
 write :: FilePath -> IO Dictionary -> IO Dictionary
@@ -116,8 +143,8 @@ writeDef :: FilePath -> Definition -> IO Definition
 writeDef dest def =
   let
     path = joinPath [rootPath def, dest, localPath def]
-    cont = fromMaybe "" (content def)
+    cont = fromMaybe (Text.pack "") (content def)
   in
     createDirectoryIfMissing True (takeDirectory path)
-    >> Text.writeFile path (Text.pack cont)
+    >> Text.writeFile path cont
     >> return def
