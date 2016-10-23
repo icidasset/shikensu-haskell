@@ -62,8 +62,8 @@ import Shikensu.Types
 import Shikensu.Utilities
 import System.FilePath
 
+import qualified Data.HashMap.Strict as HashMap (empty)
 import qualified Data.List as List (concat, map, zip)
-import qualified Data.Map.Lazy as Map (empty)
 
 
 
@@ -128,7 +128,7 @@ Example definition, given:
       , workingDirectory = "example"
 
       , content = Nothing
-      , metadata = Map.empty
+      , metadata = HashMap.empty
       , parentPath = "../"
       , pathToRoot = "../../"
       }
@@ -159,7 +159,7 @@ makeDefinition deps absPath =
 
       -- Additional properties
       , content = Nothing
-      , metadata = Map.empty
+      , metadata = HashMap.empty
       , parentPath = compileParentPath dirname
       , pathToRoot = compilePathToRoot dirname
       }

@@ -1,7 +1,7 @@
 module Shikensu.Types where
 
-import Data.Map.Lazy (Map)
-import Data.Text.Lazy (Text)
+import Data.Aeson (Object)
+import Data.Text (Text)
 
 
 {-| A file definition, along with some additional properties.
@@ -42,5 +42,5 @@ data Dependencies =
 
 
 type Dictionary = [Definition]
-type Metadata = Map String String
+type Metadata = Object
 type Pattern = String

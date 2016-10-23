@@ -1,7 +1,7 @@
 module Test.Contrib (contribTests) where
 
 import Data.Maybe (fromMaybe)
-import Data.Text.Lazy (Text)
+import Data.Text (Text)
 import Flow
 import Shikensu.Utilities ((<&>), rmap)
 import System.FilePath (joinPath)
@@ -9,10 +9,11 @@ import Test.Helpers
 import Test.Tasty
 import Test.Tasty.HUnit
 
+import qualified Data.Aeson.Types as Aeson (Value(..))
+import qualified Data.HashMap.Strict as HashMap (fromList, lookup)
 import qualified Data.List as List (head, reverse)
-import qualified Data.Map.Lazy as Map (fromList, lookup)
-import qualified Data.Text.Lazy as Text (intercalate, pack, unpack)
-import qualified Data.Text.Lazy.IO as Text (readFile)
+import qualified Data.Text as Text (intercalate, pack, unpack)
+import qualified Data.Text.IO as Text (readFile)
 import qualified Shikensu
 import qualified Shikensu.Contrib as Contrib
 import qualified Shikensu.Types as Shikensu
@@ -78,18 +79,17 @@ testClone =
 testMetadata :: TestTree
 testMetadata =
   let
-    testData = [
-        ("title", "Hello world!")
-      , ("order", "1")
-      ]
+    key         = Text.pack "title"
+    value       = Aeson.String (Text.pack "Hello world!")
+    testData    = HashMap.fromList [ (key, value) ]
 
-    dictionary = Contrib.insertMetadata (Map.fromList testData) example_md
-    definition = fmap (List.head . List.reverse) dictionary
+    dictionary  = Contrib.insertMetadata testData example_md
+    definition  = fmap (List.head . List.reverse) dictionary
 
-    lookupTitle = \def -> Map.lookup "title" (Shikensu.metadata def)
+    lookupTitle = \def -> HashMap.lookup key (Shikensu.metadata def)
   in
     testCase "Should `metadata`"
-      $ definition `rmap` lookupTitle >>= assertEq (Just "Hello world!")
+      $ definition `rmap` lookupTitle >>= assertEq (Just value)
 
 
 

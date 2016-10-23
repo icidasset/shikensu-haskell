@@ -17,7 +17,7 @@ module Shikensu.Contrib
   ) where
 
 import Data.Maybe (fromMaybe)
-import Data.Text.Lazy (Text)
+import Data.Text (Text)
 import Flow
 import Shikensu (absolutePath, forkDefinition, localPath)
 import Shikensu.Types
@@ -25,9 +25,9 @@ import Shikensu.Utilities (cleanPath)
 import System.Directory (createDirectoryIfMissing)
 import System.FilePath (FilePath, combine, joinPath, takeDirectory)
 
-import qualified Data.Map.Lazy as Map (union)
-import qualified Data.Text.Lazy as Text (pack)
-import qualified Data.Text.Lazy.IO as Text (readFile, writeFile)
+import qualified Data.HashMap.Strict as HashMap (union)
+import qualified Data.Text as Text (pack)
+import qualified Data.Text.IO as Text (readFile, writeFile)
 import qualified Shikensu (io, mapIO, mapPure, pure)
 
 
@@ -56,7 +56,7 @@ insertMetadata a = Shikensu.mapPure (insertMetadataDef a)
 
 
 insertMetadataDef :: Metadata -> Definition -> Definition
-insertMetadataDef given def = def { metadata = Map.union given (metadata def) }
+insertMetadataDef given def = def { metadata = HashMap.union given (metadata def) }
 
 
 
