@@ -20,7 +20,7 @@ data Definition =
     , metadata :: Metadata
     , parentPath :: Maybe FilePath
     , pathToRoot :: FilePath
-    }
+    } deriving (Show)
 
 
 {-| Definition dependencies.
@@ -33,7 +33,7 @@ data Dependencies =
   Dependencies
     { _pattern :: String
     , _rootPath :: FilePath
-    }
+    } deriving (Show)
 
 
 
