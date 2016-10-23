@@ -9,6 +9,7 @@ module Shikensu
   , mapPure
   , absolutePath
   , localPath
+  , transposeMetadata
   , sortByAbsolutePath
   ) where
 
@@ -62,6 +63,7 @@ import Shikensu.Types
 import Shikensu.Utilities
 import System.FilePath
 
+import qualified Data.Aeson as Aeson (FromJSON, Result(..), fromJSON, toJSON)
 import qualified Data.HashMap.Strict as HashMap (empty)
 import qualified Data.List as List (concat, map, zip)
 
@@ -208,6 +210,37 @@ absolutePath def =
 localPath :: Definition -> String
 localPath def =
   joinPath [dirname def, (basename def) ++ (extname def)]
+
+
+
+
+-- Metadata functions
+
+
+{-| Transpose metadata.
+
+Transpose our metadata object to a given type
+which implements the Aeson.FromJSON instance.
+
+    data Example =
+      Example { some :: Text }
+      deriving (Generic, FromJSON)
+
+    hashMap     = HashMap.fromList [ ("some", "metadata") ]
+    defaultEx   = Example { some = "default" }
+    example     = transposeMetadata hashMap defaultExample :: Example
+
+-}
+transposeMetadata :: Aeson.FromJSON a => Metadata -> a -> a
+transposeMetadata hashMap fallback =
+  let
+    result = hashMap
+      |> Aeson.toJSON
+      |> Aeson.fromJSON :: Aeson.FromJSON b => Aeson.Result b
+  in
+    case result of
+      Aeson.Success x -> x
+      Aeson.Error _   -> fallback
 
 
 
