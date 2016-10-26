@@ -10,6 +10,7 @@ module Shikensu
   , absolutePath
   , localPath
   , transposeMetadata
+  , transposeToMetadata
   , sortByAbsolutePath
   ) where
 
@@ -63,7 +64,7 @@ import Shikensu.Types
 import Shikensu.Utilities
 import System.FilePath
 
-import qualified Data.Aeson as Aeson (FromJSON, Result(..), fromJSON, toJSON)
+import qualified Data.Aeson as Aeson (FromJSON, Result(..), ToJSON, fromJSON, toJSON)
 import qualified Data.HashMap.Strict as HashMap (empty)
 import qualified Data.List as List (concat, map, zip)
 
@@ -241,6 +242,20 @@ transposeMetadata hashMap fallback =
     case result of
       Aeson.Success x -> x
       Aeson.Error _   -> fallback
+
+
+{-| Inverse of `transposeMetadata`.
+-}
+transposeToMetadata :: (Aeson.ToJSON a, Aeson.FromJSON a) => a -> Metadata
+transposeToMetadata generic =
+  let
+    result = generic
+      |> Aeson.toJSON
+      |> Aeson.fromJSON :: Aeson.FromJSON b => Aeson.Result b
+  in
+    case result of
+      Aeson.Success x -> x
+      Aeson.Error _   -> HashMap.empty
 
 
 
