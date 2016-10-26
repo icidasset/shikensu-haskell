@@ -5,15 +5,17 @@ module Shikensu.Contrib
   , permalink
   , permalinkDef
   , Shikensu.Contrib.read
-  , readDef
+  , Shikensu.Contrib.readDef
   , rename
   , renameDef
   , renameExt
   , renameExtDef
   , renderContent
   , renderContentDef
+  , replaceMetadata
+  , replaceMetadataDef
   , Shikensu.Contrib.write
-  , writeDef
+  , Shikensu.Contrib.writeDef
   ) where
 
 import Data.Maybe (fromMaybe)
@@ -130,6 +132,17 @@ renderContent a = Shikensu.mapPure (renderContentDef a)
 
 renderContentDef :: (Definition -> Maybe Text) -> Definition -> Definition
 renderContentDef renderer def = def { content = renderer def }
+
+
+
+{-| Replace metadata
+-}
+replaceMetadata :: Metadata -> IO Dictionary -> IO Dictionary
+replaceMetadata a = Shikensu.mapPure (replaceMetadataDef a)
+
+
+replaceMetadataDef :: Metadata -> Definition -> Definition
+replaceMetadataDef given def = def { metadata = given }
 
 
 

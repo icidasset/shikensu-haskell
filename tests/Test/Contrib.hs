@@ -79,17 +79,40 @@ testClone =
 testMetadata :: TestTree
 testMetadata =
   let
-    key         = Text.pack "title"
-    value       = Aeson.String (Text.pack "Hello world!")
-    testData    = HashMap.fromList [ (key, value) ]
+    keyA        = Text.pack "title"
+    valueA      = Aeson.String (Text.pack "Hello world!")
 
-    dictionary  = Contrib.insertMetadata testData example_md
+    keyB        = Text.pack "hello"
+    valueB      = Aeson.String (Text.pack "Guardian.")
+
+    keyC        = Text.pack "removed"
+    valueC      = Aeson.String (Text.pack "Me.")
+
+    -- 1. Insert C
+    -- 2. Replace with A
+    -- 3. Insert B
+    dictionary  = example_md
+      |> Contrib.insertMetadata (HashMap.fromList [ (keyC, valueC) ])
+      |> Contrib.replaceMetadata (HashMap.fromList [ (keyA, valueA) ])
+      |> Contrib.insertMetadata (HashMap.fromList [ (keyB, valueB) ])
+
     definition  = fmap (List.head . List.reverse) dictionary
 
-    lookupTitle = \def -> HashMap.lookup key (Shikensu.metadata def)
+    lookupTitle = \def -> HashMap.lookup keyA (Shikensu.metadata def)
+    lookupHello = \def -> HashMap.lookup keyB (Shikensu.metadata def)
+    lookupRemoved = \def -> HashMap.lookup keyC (Shikensu.metadata def)
   in
-    testCase "Should `metadata`"
-      $ definition `rmap` lookupTitle >>= assertEq (Just value)
+    testGroup
+      "Metadata"
+      [ testCase "Should no longer have `removed` key"
+        $ definition `rmap` lookupRemoved >>= assertEq Nothing
+
+      , testCase "Should have `hello` key"
+        $ definition `rmap` lookupHello >>= assertEq (Just valueB)
+
+      , testCase "Should have `title` key"
+        $ definition `rmap` lookupTitle >>= assertEq (Just valueA)
+      ]
 
 
 
