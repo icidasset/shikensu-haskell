@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Shikensu.Contrib
   ( clone
   , insertMetadata
@@ -28,7 +29,6 @@ import System.Directory (createDirectoryIfMissing)
 import System.FilePath (FilePath, combine, joinPath, takeDirectory)
 
 import qualified Data.HashMap.Strict as HashMap (union)
-import qualified Data.Text as Text (pack)
 import qualified Data.Text.IO as Text (readFile, writeFile)
 import qualified Shikensu (io, mapIO, mapPure, pure)
 
@@ -156,7 +156,7 @@ writeDef :: FilePath -> Definition -> IO Definition
 writeDef dest def =
   let
     path = joinPath [rootPath def, dest, localPath def]
-    cont = fromMaybe (Text.pack "") (content def)
+    cont = fromMaybe "" (content def)
   in
     createDirectoryIfMissing True (takeDirectory path)
     >> Text.writeFile path cont

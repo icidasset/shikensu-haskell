@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Shikensu.Utilities
   ( (<&>)
   , rmap
@@ -98,8 +99,7 @@ globDir a b = fmap fst (Glob.globDir b a)
 Otherwise return the path.
 -}
 replaceSingleDot :: String -> String
-replaceSingleDot path =
-  if path == "." then "" else path
+replaceSingleDot path = if path == "." then "" else path
 
 
 {-| Strip prefix
