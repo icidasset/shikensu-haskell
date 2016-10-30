@@ -45,8 +45,8 @@ testRegular =
       , testCase "Should have the correct pattern"
         $ definition `rmap` Shikensu.pattern >>= assertEq pattern
 
-      , testCase "Should have the correct workingDirectory"
-        $ definition `rmap` Shikensu.workingDirectory >>= assertEq "tests"
+      , testCase "Should have the correct workingDirname"
+        $ definition `rmap` Shikensu.workingDirname >>= assertEq "tests"
 
       ]
 
@@ -75,8 +75,8 @@ testDot =
       , testCase "Should have the correct pattern"
         $ definition `rmap` Shikensu.pattern >>= assertEq pattern
 
-      , testCase "Should have the correct workingDirectory"
-        $ definition `rmap` Shikensu.workingDirectory >>= assertEq "tests"
+      , testCase "Should have the correct workingDirname"
+        $ definition `rmap` Shikensu.workingDirname >>= assertEq "tests"
 
       ]
 
@@ -89,7 +89,7 @@ testWithoutWd =
     definition = fmap List.head dictionary
     localPath = "fixtures/example.md"
   in
-    testGroup "Test without workingDirectory"
+    testGroup "Test without workingDirname"
       [ testCase "Should have the correct basename"
         $ definition `rmap` Shikensu.basename >>= assertEq "example"
 
@@ -105,8 +105,8 @@ testWithoutWd =
       , testCase "Should have the correct pattern"
         $ definition `rmap` Shikensu.pattern >>= assertEq pattern
 
-      , testCase "Should have the correct workingDirectory"
-        $ definition `rmap` Shikensu.workingDirectory >>= assertEq ""
+      , testCase "Should have the correct workingDirname"
+        $ definition `rmap` Shikensu.workingDirname >>= assertEq ""
 
       ]
 
@@ -135,7 +135,7 @@ testRootFile =
       , testCase "Should have the correct pattern"
         $ definition `rmap` Shikensu.pattern >>= assertEq pattern
 
-      , testCase "Should have the correct workingDirectory"
-        $ definition `rmap` Shikensu.workingDirectory >>= assertEq ""
+      , testCase "Should have the correct workingDirname"
+        $ definition `rmap` Shikensu.workingDirname >>= assertEq ""
 
       ]

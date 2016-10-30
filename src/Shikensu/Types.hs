@@ -13,27 +13,14 @@ data Definition =
     , dirname :: FilePath
     , extname :: String
     , pattern :: Pattern
-    , rootPath :: FilePath
-    , workingDirectory :: FilePath
+    , rootDirname :: FilePath
+    , workingDirname :: FilePath
 
     -- Additional properties
     , content :: Maybe Text
     , metadata :: Metadata
     , parentPath :: Maybe FilePath
     , pathToRoot :: FilePath
-    } deriving (Show)
-
-
-{-| Definition dependencies.
-
-A set of properties all definitions from a `Dictionary` produced
-by `makeDictionary` have in common.
-
--}
-data Dependencies =
-  Dependencies
-    { _pattern :: String
-    , _rootPath :: FilePath
     } deriving (Show)
 
 

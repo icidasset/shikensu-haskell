@@ -155,7 +155,7 @@ write a = Shikensu.mapIO (writeDef a)
 writeDef :: FilePath -> Definition -> IO Definition
 writeDef dest def =
   let
-    path = joinPath [rootPath def, dest, localPath def]
+    path = joinPath [rootDirname def, dest, localPath def]
     cont = fromMaybe "" (content def)
   in
     createDirectoryIfMissing True (takeDirectory path)

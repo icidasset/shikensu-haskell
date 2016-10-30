@@ -11,6 +11,7 @@ module Shikensu.Utilities
   , globDir
   , replaceSingleDot
   , stripPrefix
+  , takeDirName
   ) where
 
 import Data.Maybe (fromMaybe)
@@ -44,7 +45,7 @@ cleanPath :: FilePath -> FilePath
 cleanPath = normalise .> dropTrailingPathSeparator .> dropDrive .> replaceSingleDot
 
 
-{-| Get the common directory from a Pattern
+{-| Get the common directory from a Pattern.
 -}
 commonDirectory :: Pattern -> FilePath
 commonDirectory pattern = (Glob.compile .> Glob.commonDirectory .> fst) pattern
@@ -90,9 +91,13 @@ compilePathToRoot dirname =
 
 
 {-| List contents of a directory using a glob pattern.
+Returns a relative path, based on the given rootDirname.
 -}
 globDir :: FilePath -> [Glob.Pattern] -> IO [[FilePath]]
-globDir a b = fmap fst (Glob.globDir b a)
+globDir rootDir patterns =
+  Glob.globDir patterns rootDir
+    |> fmap (fst)
+    |> fmap (List.map . List.map . makeRelative $ rootDir)
 
 
 {-| If the path is a single dot, return an empty string.
@@ -102,7 +107,13 @@ replaceSingleDot :: String -> String
 replaceSingleDot path = if path == "." then "" else path
 
 
-{-| Strip prefix
+{-| Strip prefix.
 -}
 stripPrefix :: String -> String -> String
 stripPrefix prefix target = fromMaybe target (List.stripPrefix prefix target)
+
+
+{-| Take dirname.
+-}
+takeDirName :: FilePath -> FilePath
+takeDirName = replaceSingleDot . takeDirectory

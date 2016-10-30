@@ -26,7 +26,7 @@ module Shikensu
 
     dictionary_io :: IO Dictionary
     dictionary_io =
-      Shikensu.list ["**/*.html"] absolute_path
+      Shikensu.list ["**/*.html"] absolute_path_to_cwd
 
 
     dictionary_io
@@ -82,12 +82,12 @@ import qualified Data.List as List (concat, map, zip)
 
 -}
 list :: [Pattern] -> FilePath -> IO Dictionary
-list patterns rootPath =
+list patterns rootDir =
   patterns
     |> compilePatterns
-    |> globDir rootPath
+    |> globDir rootDir
     |> fmap (List.zip patterns)
-    |> fmap (List.map (makeDictionary rootPath))
+    |> fmap (List.map (makeDictionary rootDir))
     |> fmap (List.concat)
 
 
@@ -96,40 +96,37 @@ list patterns rootPath =
 -}
 forkDefinition :: FilePath -> Definition -> Definition
 forkDefinition newLocalPath def =
-  let
-    dirname = replaceSingleDot (takeDirectory newLocalPath)
-  in
-    Definition
-      { basename = takeBaseName newLocalPath
-      , dirname = dirname
-      , extname = takeExtension newLocalPath
-      , pattern = (pattern def)
-      , rootPath = (rootPath def)
-      , workingDirectory = (workingDirectory def)
+  Definition
+    { basename        = takeBaseName newLocalPath
+    , dirname         = takeDirName newLocalPath
+    , extname         = takeExtension newLocalPath
+    , pattern         = (pattern def)
+    , rootDirname     = (rootDirname def)
+    , workingDirname  = (workingDirname def)
 
-      -- Additional properties
-      , content = (content def)
-      , metadata = (metadata def)
-      , parentPath = compileParentPath dirname
-      , pathToRoot = compilePathToRoot dirname
-      }
+    -- Additional properties
+    , content         = (content def)
+    , metadata        = (metadata def)
+    , parentPath      = compileParentPath $ takeDirName newLocalPath
+    , pathToRoot      = compilePathToRoot $ takeDirName newLocalPath
+    }
 
 
 
 {-| Make a Definition.
 
 Example definition, given:
-- the absolute path `/Users/icidasset/Projects/shikensu/example/test/hello.md`
-- {deps} the root path `/Users/icidasset/Projects/shikensu`
-- {deps} the pattern `example/**/*.md`
+- the root path `/Users/icidasset/Projects/shikensu`
+- the pattern `example/**/*.md`
+- the workspace path `example/test/hello.md`
 
     Definition
       { basename = "hello"
       , dirname = "test"
       , extname = ".md"
       , pattern = "example/**/*.md"
-      , rootPath = "/Users/icidasset/Projects/shikensu"
-      , workingDirectory = "example"
+      , rootDirname = "/Users/icidasset/Projects/shikensu"
+      , workingDirname = "example"
 
       , content = Nothing
       , metadata = HashMap.empty
@@ -138,34 +135,25 @@ Example definition, given:
       }
 
 -}
-makeDefinition :: Dependencies -> FilePath -> Definition
-makeDefinition deps absPath =
+makeDefinition :: FilePath -> Pattern -> FilePath -> Definition
+makeDefinition _rootDirname _pattern _workspacePath =
   let
-    pattern         = _pattern deps
-    rootPath        = _rootPath deps
-
-    -- The following assumes that absPath and rootPath have a format of `/a/b/c(/)`
-    -- (ie. for POSIX systems)
-
-    absPath'        = normalise absPath
-    workingDir      = cleanPath (commonDirectory pattern)
-    absWorkingDir   = joinPath [rootPath, workingDir]
-    localPath       = cleanPath (stripPrefix absWorkingDir absPath')
-    dirname         = replaceSingleDot (takeDirectory localPath)
+    workingDir  = cleanPath . (commonDirectory) $ _pattern
+    localPath   = cleanPath . (stripPrefix workingDir) . cleanPath $ _workspacePath
   in
     Definition
-      { basename = takeBaseName localPath
-      , dirname = dirname
-      , extname = takeExtension localPath
-      , pattern = pattern
-      , rootPath = rootPath
-      , workingDirectory = workingDir
+      { basename        = takeBaseName localPath
+      , dirname         = takeDirName localPath
+      , extname         = takeExtension localPath
+      , pattern         = _pattern
+      , rootDirname     = dropTrailingPathSeparator _rootDirname
+      , workingDirname  = workingDir
 
       -- Additional properties
-      , content = Nothing
-      , metadata = HashMap.empty
-      , parentPath = compileParentPath dirname
-      , pathToRoot = compilePathToRoot dirname
+      , content         = Nothing
+      , metadata        = HashMap.empty
+      , parentPath      = compileParentPath $ takeDirName localPath
+      , pathToRoot      = compilePathToRoot $ takeDirName localPath
       }
 
 
@@ -173,8 +161,8 @@ makeDefinition deps absPath =
 {-| Make a Dictionary.
 -}
 makeDictionary :: FilePath -> (Pattern, [FilePath]) -> Dictionary
-makeDictionary rootPath (pattern, files) =
-  makeDefinition Dependencies { _pattern = pattern, _rootPath = rootPath } <$> files
+makeDictionary _rootDirname (_pattern, files) =
+  makeDefinition _rootDirname _pattern <$> files
 
 
 
@@ -206,12 +194,17 @@ mapPure = (Shikensu.pure . List.map)
 
 absolutePath :: Definition -> String
 absolutePath def =
-  joinPath [rootPath def, workingDirectory def, localPath def]
+  joinPath [rootDirname def, workspacePath def]
 
 
 localPath :: Definition -> String
 localPath def =
   joinPath [dirname def, (basename def) ++ (extname def)]
+
+
+workspacePath :: Definition -> String
+workspacePath def =
+  joinPath [workingDirname def, localPath def]
 
 
 

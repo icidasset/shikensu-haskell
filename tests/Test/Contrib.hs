@@ -181,6 +181,6 @@ testWrite =
   in
     testCase "Should `write`"
       $ definition
-          <&> Shikensu.rootPath
+          <&> Shikensu.rootDirname
           >>= \r -> Text.readFile (joinPath [r, destination, "fixtures/example.md"])
           >>= \c -> assertEq "# Example\n" (Text.unpack c)
