@@ -5,8 +5,6 @@ module Shikensu.Contrib
   , insertMetadataDef
   , permalink
   , permalinkDef
-  , Shikensu.Contrib.read
-  , Shikensu.Contrib.readDef
   , rename
   , renameDef
   , renameExt
@@ -15,46 +13,36 @@ module Shikensu.Contrib
   , renderContentDef
   , replaceMetadata
   , replaceMetadataDef
-  , Shikensu.Contrib.write
-  , Shikensu.Contrib.writeDef
   ) where
 
-import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import Flow
-import Shikensu (absolutePath, forkDefinition, localPath)
+import Shikensu (forkDefinition)
 import Shikensu.Types
 import Shikensu.Utilities (cleanPath)
-import System.Directory (createDirectoryIfMissing)
-import System.FilePath (FilePath, combine, joinPath, takeDirectory)
+import System.FilePath (FilePath, combine)
 
 import qualified Data.HashMap.Strict as HashMap (union)
-import qualified Data.Text.IO as Text (readFile, writeFile)
-import qualified Shikensu (io, mapIO, mapPure, pure)
 
 
 {-| Clone
 -}
-clone :: FilePath -> FilePath -> IO Dictionary -> IO Dictionary
-clone existingPath newPath =
+clone :: FilePath -> FilePath -> Dictionary -> Dictionary
+clone existingPath newPath dict =
   let
-    fn = \dict ->
-      let
-        makeNew = \def acc ->
-          if (localPath def) == existingPath
-            then acc ++ [forkDefinition newPath def]
-            else acc
-      in
-        dict ++ (foldr makeNew [] dict)
+    makeNew = \def acc ->
+      if (localPath def) == existingPath
+        then acc ++ [forkDefinition newPath def]
+        else acc
   in
-    Shikensu.pure fn
+    dict ++ (foldr makeNew [] dict)
 
 
 
 {-| Insert metadata
 -}
-insertMetadata :: Metadata -> IO Dictionary -> IO Dictionary
-insertMetadata a = Shikensu.mapPure (insertMetadataDef a)
+insertMetadata :: Metadata -> Dictionary -> Dictionary
+insertMetadata a = fmap (insertMetadataDef a)
 
 
 insertMetadataDef :: Metadata -> Definition -> Definition
@@ -64,8 +52,8 @@ insertMetadataDef given def = def { metadata = HashMap.union given (metadata def
 
 {-| Permalink
 -}
-permalink :: String -> IO Dictionary -> IO Dictionary
-permalink a = Shikensu.mapPure (permalinkDef a)
+permalink :: String -> Dictionary -> Dictionary
+permalink a = fmap (permalinkDef a)
 
 
 permalinkDef :: String -> Definition -> Definition
@@ -82,24 +70,10 @@ permalinkDef newBasename def =
 
 
 
-{-| Read
--}
-read :: IO Dictionary -> IO Dictionary
-read = Shikensu.mapIO (readDef)
-
-
-readDef :: Definition -> IO Definition
-readDef def =
-  fmap
-    (\c -> def { content = Just c })
-    (Text.readFile $ absolutePath def)
-
-
-
 {-| Rename
 -}
-rename :: FilePath -> FilePath -> IO Dictionary -> IO Dictionary
-rename a b = Shikensu.mapPure (renameDef a b)
+rename :: FilePath -> FilePath -> Dictionary -> Dictionary
+rename a b = fmap (renameDef a b)
 
 
 renameDef :: FilePath -> FilePath -> Definition -> Definition
@@ -112,8 +86,8 @@ renameDef oldPath newPath def =
 
 {-| Rename extension
 -}
-renameExt :: String -> String -> IO Dictionary -> IO Dictionary
-renameExt a b = Shikensu.mapPure (renameExtDef a b)
+renameExt :: String -> String -> Dictionary -> Dictionary
+renameExt a b = fmap (renameExtDef a b)
 
 
 renameExtDef :: String -> String -> Definition -> Definition
@@ -126,8 +100,8 @@ renameExtDef oldExtname newExtname def =
 
 {-| Render content
 -}
-renderContent :: (Definition -> Maybe Text) -> IO Dictionary -> IO Dictionary
-renderContent a = Shikensu.mapPure (renderContentDef a)
+renderContent :: (Definition -> Maybe Text) -> Dictionary -> Dictionary
+renderContent a = fmap (renderContentDef a)
 
 
 renderContentDef :: (Definition -> Maybe Text) -> Definition -> Definition
@@ -137,27 +111,9 @@ renderContentDef renderer def = def { content = renderer def }
 
 {-| Replace metadata
 -}
-replaceMetadata :: Metadata -> IO Dictionary -> IO Dictionary
-replaceMetadata a = Shikensu.mapPure (replaceMetadataDef a)
+replaceMetadata :: Metadata -> Dictionary -> Dictionary
+replaceMetadata a = fmap (replaceMetadataDef a)
 
 
 replaceMetadataDef :: Metadata -> Definition -> Definition
 replaceMetadataDef given def = def { metadata = given }
-
-
-
-{-| Write
--}
-write :: FilePath -> IO Dictionary -> IO Dictionary
-write a = Shikensu.mapIO (writeDef a)
-
-
-writeDef :: FilePath -> Definition -> IO Definition
-writeDef dest def =
-  let
-    path = joinPath [rootDirname def, dest, localPath def]
-    cont = fromMaybe "" (content def)
-  in
-    createDirectoryIfMissing True (takeDirectory path)
-    >> Text.writeFile path cont
-    >> return def

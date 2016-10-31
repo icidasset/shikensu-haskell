@@ -36,8 +36,11 @@ library
   exposed-modules:
     Shikensu,
     Shikensu.Contrib,
-    Shikensu.Utilities,
-    Shikensu.Types
+    Shikensu.Contrib.IO,
+    Shikensu.Metadata,
+    Shikensu.Sorting,
+    Shikensu.Types,
+    Shikensu.Utilities
 
   build-depends:
     aeson == 0.11.*,

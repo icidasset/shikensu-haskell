@@ -3,7 +3,6 @@ module Test.Contrib (contribTests) where
 import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import Flow
-import Shikensu.Utilities ((<&>), rmap)
 import System.FilePath (joinPath)
 import Test.Helpers
 import Test.Tasty
@@ -16,6 +15,7 @@ import qualified Data.Text as Text (intercalate, pack, unpack)
 import qualified Data.Text.IO as Text (readFile)
 import qualified Shikensu
 import qualified Shikensu.Contrib as Contrib
+import qualified Shikensu.Contrib.IO as Contrib.IO
 import qualified Shikensu.Types as Shikensu
 
 
@@ -68,7 +68,7 @@ renderer def =
 testClone :: TestTree
 testClone =
   let
-    dictionary = Contrib.clone "example.md" "cloned.md" example_md
+    dictionary = fmap (Contrib.clone "example.md" "cloned.md") example_md
     definition = fmap (List.head . List.reverse) dictionary
   in
     testCase "Should `clone`"
@@ -91,10 +91,11 @@ testMetadata =
     -- 1. Insert C
     -- 2. Replace with A
     -- 3. Insert B
-    dictionary  = example_md
-      |> Contrib.insertMetadata (HashMap.fromList [ (keyC, valueC) ])
-      |> Contrib.replaceMetadata (HashMap.fromList [ (keyA, valueA) ])
-      |> Contrib.insertMetadata (HashMap.fromList [ (keyB, valueB) ])
+    dictionary = example_md
+      <&> ( Contrib.insertMetadata (HashMap.fromList [ (keyC, valueC) ])
+         .> Contrib.replaceMetadata (HashMap.fromList [ (keyA, valueA) ])
+         .> Contrib.insertMetadata (HashMap.fromList [ (keyB, valueB) ])
+      )
 
     definition  = fmap (List.head . List.reverse) dictionary
 
@@ -119,8 +120,8 @@ testMetadata =
 testPermalink :: TestTree
 testPermalink =
   let
-    dictionary = Contrib.permalink "index" example_md
-    definition = fmap List.head dictionary
+    dictionary = fmap (Contrib.permalink "index") example_md
+    definition = fmap (List.head) dictionary
   in
     testCase "Should `permalink`"
       $ definition `rmap` Shikensu.localPath >>= assertEq "example/index.md"
@@ -130,7 +131,7 @@ testPermalink =
 testRead :: TestTree
 testRead =
   let
-    dictionary = Contrib.read example_md
+    dictionary = Contrib.IO.read example_md
     definition = fmap List.head dictionary
   in
     testCase "Should `read`"
@@ -141,8 +142,8 @@ testRead =
 testRename :: TestTree
 testRename =
   let
-    dictionary = Contrib.rename "example.md" "renamed.md" example_md
-    definition = fmap List.head dictionary
+    dictionary = fmap (Contrib.rename "example.md" "renamed.md") example_md
+    definition = fmap (List.head) dictionary
   in
     testCase "Should `rename`"
       $ definition `rmap` Shikensu.localPath >>= assertEq "renamed.md"
@@ -152,8 +153,8 @@ testRename =
 testRenameExt :: TestTree
 testRenameExt =
   let
-    dictionary = Contrib.renameExt ".md" ".html" example_md
-    definition = fmap List.head dictionary
+    dictionary = fmap (Contrib.renameExt ".md" ".html") example_md
+    definition = fmap (List.head) dictionary
   in
     testCase "Should `renameExt`"
       $ definition `rmap` Shikensu.extname >>= assertEq ".html"
@@ -163,8 +164,8 @@ testRenameExt =
 testRenderContent :: TestTree
 testRenderContent =
   let
-    dictionary = Contrib.renderContent renderer (Contrib.read example_md)
-    definition = fmap List.head dictionary
+    dictionary = fmap (Contrib.renderContent renderer) (Contrib.IO.read example_md)
+    definition = fmap (List.head) dictionary
     expectedResult = Just (Text.pack "<html># Example\n</html>")
   in
     testCase "Should `renderContent`"
@@ -176,7 +177,7 @@ testWrite :: TestTree
 testWrite =
   let
     destination = "tests/build/"
-    dictionary = Contrib.write destination $ (Contrib.read . list) "tests/**/example.md"
+    dictionary = Contrib.IO.write destination $ (Contrib.IO.read . list) "tests/**/example.md"
     definition = fmap List.head dictionary
   in
     testCase "Should `write`"

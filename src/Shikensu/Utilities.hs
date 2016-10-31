@@ -1,9 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Shikensu.Utilities
-  ( (<&>)
-  , rmap
-
-  , cleanPath
+  ( cleanPath
   , commonDirectory
   , compilePatterns
   , compileParentPath
@@ -22,16 +19,6 @@ import System.FilePath
 
 import qualified Data.List as List (map, stripPrefix)
 import qualified System.FilePath.Glob as Glob
-
-
-{-| Flipped fmap.
--}
-(<&>) :: Functor f => f a -> (a -> b) -> f b
-(<&>) = flip fmap
-
-
-rmap :: Functor f => f a -> (a -> b) -> f b
-rmap = (<&>)
 
 
 {-| "Clean up" a path.

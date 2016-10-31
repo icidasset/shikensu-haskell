@@ -1,18 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Shikensu
   ( list
+  , Shikensu.io
+  , mapIO
+
   , forkDefinition
   , makeDefinition
   , makeDictionary
-  , Shikensu.io
-  , Shikensu.pure
-  , mapIO
-  , mapPure
-  , absolutePath
-  , localPath
-  , transposeMetadata
-  , transposeToMetadata
-  , sortByAbsolutePath
   ) where
 
 
@@ -20,43 +14,25 @@ module Shikensu
 
 ## How to use
 
-    import Shikensu (list)
+    import qualified Shikensu
+
     import Shikensu.Types (Definition, Dictionary)
-    import Shikensu.Contrib (read, rename, write)
+    import Shikensu.Contrib (clone, renameExt, permalink)
+    import Shikensu.Contrib.IO (read, write)
+
 
     dictionary_io :: IO Dictionary
     dictionary_io =
       Shikensu.list ["**/*.html"] absolute_path_to_cwd
+        |> read
+        |> fmap flow
+        |> write "./build"
 
 
-    dictionary_io
-      |> read
-      |> rename "main.html" "index.html"
-      |> write "./build"
-
-
-    dictionary_io
-      |> Shikensu.io a
-      |> Shikensu.pure b
-
-      -- which is basically
-
-      |> (=<<) (sequence . a)
-      |> fmap b
-
-
-    -- Where a :: [Definition] -> [IO Definition]
-    --       b :: [Definition] -> [Definition]
-    --
-    -- type alias Dictionary = [Definition]
-
-
-    dictionary_io
-      |> Shikensu.mapIO x
-      |> Shikensu.mapPure y
-
-    -- Where x :: Definition -> IO Definition
-    --       y :: Definition -> Definition
+    flow =
+         renameExt ".mustache" ".html"
+      .> permalink "index"
+      .> clone "index.html" "200.html"
 
 -}
 
@@ -65,10 +41,12 @@ import Shikensu.Types
 import Shikensu.Utilities
 import System.FilePath
 
-import qualified Data.Aeson as Aeson (FromJSON, Result(..), ToJSON, fromJSON, toJSON)
 import qualified Data.HashMap.Strict as HashMap (empty)
 import qualified Data.List as List (concat, map, zip)
 
+
+
+-- IO
 
 
 {-| Make a single dictionary based on multiple glob patterns and a path to a directory.
@@ -87,9 +65,23 @@ list patterns rootDir =
     |> compilePatterns
     |> globDir rootDir
     |> fmap (List.zip patterns)
-    |> fmap (List.map (makeDictionary rootDir))
+    |> fmap (List.map (uncurry . makeDictionary $ rootDir))
     |> fmap (List.concat)
 
+
+{-| IO sequence helpers.
+-}
+io :: ([Definition] -> [IO Definition]) -> IO Dictionary -> IO Dictionary
+io fn = (=<<) (sequence . fn)
+
+
+mapIO :: (Definition -> IO Definition) -> IO Dictionary -> IO Dictionary
+mapIO = (Shikensu.io . List.map)
+
+
+
+
+-- PURE
 
 
 {-| Fork a Definition.
@@ -160,104 +152,5 @@ makeDefinition _rootDirname _pattern _workspacePath =
 
 {-| Make a Dictionary.
 -}
-makeDictionary :: FilePath -> (Pattern, [FilePath]) -> Dictionary
-makeDictionary _rootDirname (_pattern, files) =
-  makeDefinition _rootDirname _pattern <$> files
-
-
-
-
--- Sequence functions
---   (See the documentation above and the Contrib module for more info)
-
-
-io :: ([Definition] -> [IO Definition]) -> IO Dictionary -> IO Dictionary
-io fn = (=<<) (sequence . fn)
-
-
-pure :: ([Definition] -> [Definition]) -> IO Dictionary -> IO Dictionary
-pure fn = (<$>) (fn)
-
-
-mapIO :: (Definition -> IO Definition) -> IO Dictionary -> IO Dictionary
-mapIO = (Shikensu.io . List.map)
-
-
-mapPure :: (Definition -> Definition) -> IO Dictionary -> IO Dictionary
-mapPure = (Shikensu.pure . List.map)
-
-
-
-
--- Path functions
-
-
-absolutePath :: Definition -> String
-absolutePath def =
-  joinPath [rootDirname def, workspacePath def]
-
-
-localPath :: Definition -> String
-localPath def =
-  joinPath [dirname def, (basename def) ++ (extname def)]
-
-
-workspacePath :: Definition -> String
-workspacePath def =
-  joinPath [workingDirname def, localPath def]
-
-
-
-
--- Metadata functions
-
-
-{-| Transpose metadata.
-
-Transpose our metadata object to a given type
-which implements the Aeson.FromJSON instance.
-
-    data Example =
-      Example { some :: Text }
-      deriving (Generic, FromJSON)
-
-    hashMap     = HashMap.fromList [ ("some", "metadata") ]
-    defaultEx   = Example { some = "default" }
-    example     = transposeMetadata hashMap defaultExample :: Example
-
--}
-transposeMetadata :: Aeson.FromJSON a => Metadata -> a -> a
-transposeMetadata hashMap fallback =
-  let
-    result = hashMap
-      |> Aeson.toJSON
-      |> Aeson.fromJSON :: Aeson.FromJSON b => Aeson.Result b
-  in
-    case result of
-      Aeson.Success x -> x
-      Aeson.Error _   -> fallback
-
-
-{-| Inverse of `transposeMetadata`.
--}
-transposeToMetadata :: (Aeson.ToJSON a, Aeson.FromJSON a) => a -> Metadata
-transposeToMetadata generic =
-  let
-    result = generic
-      |> Aeson.toJSON
-      |> Aeson.fromJSON :: Aeson.FromJSON b => Aeson.Result b
-  in
-    case result of
-      Aeson.Success x -> x
-      Aeson.Error _   -> HashMap.empty
-
-
-
-
--- Sorting functions
---   (e.g. `Data.List.sortBy Shikensu.sortByAbsolutePath dictionary`)
-
-
-sortByAbsolutePath :: Definition -> Definition -> Ordering
-sortByAbsolutePath defA defB =
-  compare (absolutePath defA) (absolutePath defB)
+makeDictionary :: FilePath -> Pattern -> [FilePath] -> Dictionary
+makeDictionary _rootDirname _pattern = List.map (makeDefinition _rootDirname _pattern)
