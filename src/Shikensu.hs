@@ -1,8 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Shikensu
   ( list
-  , Shikensu.io
-  , mapIO
 
   , forkDefinition
   , makeDefinition
@@ -67,16 +65,6 @@ list patterns rootDir =
     |> fmap (List.zip patterns)
     |> fmap (List.map (uncurry . makeDictionary $ rootDir))
     |> fmap (List.concat)
-
-
-{-| IO sequence helpers.
--}
-io :: ([Definition] -> [IO Definition]) -> IO Dictionary -> IO Dictionary
-io fn = (=<<) (sequence . fn)
-
-
-mapIO :: (Definition -> IO Definition) -> IO Dictionary -> IO Dictionary
-mapIO = (Shikensu.io . List.map)
 
 
 

@@ -6,6 +6,8 @@ module Shikensu.Utilities
   , compileParentPath
   , compilePathToRoot
   , globDir
+  , io
+  , mapIO
   , replaceSingleDot
   , stripPrefix
   , takeDirName
@@ -85,6 +87,16 @@ globDir rootDir patterns =
   Glob.globDir patterns rootDir
     |> fmap (fst)
     |> fmap (List.map . List.map . makeRelative $ rootDir)
+
+
+{-| IO Sequence helpers
+-}
+io :: ([Definition] -> [IO Definition]) -> Dictionary -> IO Dictionary
+io fn = sequence . fn
+
+
+mapIO :: (Definition -> IO Definition) -> Dictionary -> IO Dictionary
+mapIO = io . fmap
 
 
 {-| If the path is a single dot, return an empty string.

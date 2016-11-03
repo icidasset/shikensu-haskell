@@ -14,13 +14,13 @@ import System.Directory (createDirectoryIfMissing)
 import System.FilePath (FilePath, joinPath, takeDirectory)
 
 import qualified Data.Text.IO as Text (readFile, writeFile)
-import qualified Shikensu (mapIO)
+import qualified Shikensu.Utilities as Utilities (mapIO)
 
 
 {-| Read
 -}
-read :: IO Dictionary -> IO Dictionary
-read = Shikensu.mapIO (readDef)
+read :: Dictionary -> IO Dictionary
+read = Utilities.mapIO (readDef)
 
 
 readDef :: Definition -> IO Definition
@@ -33,8 +33,8 @@ readDef def =
 
 {-| Write
 -}
-write :: FilePath -> IO Dictionary -> IO Dictionary
-write a = Shikensu.mapIO (writeDef a)
+write :: FilePath -> Dictionary -> IO Dictionary
+write dest = Utilities.mapIO (writeDef dest)
 
 
 writeDef :: FilePath -> Definition -> IO Definition

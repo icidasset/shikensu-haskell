@@ -131,7 +131,7 @@ testPermalink =
 testRead :: TestTree
 testRead =
   let
-    dictionary = Contrib.IO.read example_md
+    dictionary = example_md >>= Contrib.IO.read
     definition = fmap List.head dictionary
   in
     testCase "Should `read`"
@@ -164,7 +164,7 @@ testRenameExt =
 testRenderContent :: TestTree
 testRenderContent =
   let
-    dictionary = fmap (Contrib.renderContent renderer) (Contrib.IO.read example_md)
+    dictionary = fmap (Contrib.renderContent renderer) (example_md >>= Contrib.IO.read)
     definition = fmap (List.head) dictionary
     expectedResult = Just (Text.pack "<html># Example\n</html>")
   in
@@ -177,7 +177,7 @@ testWrite :: TestTree
 testWrite =
   let
     destination = "tests/build/"
-    dictionary = Contrib.IO.write destination $ (Contrib.IO.read . list) "tests/**/example.md"
+    dictionary = list "tests/**/example.md" >>= Contrib.IO.read >>= Contrib.IO.write destination
     definition = fmap List.head dictionary
   in
     testCase "Should `write`"
