@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
 module Shikensu.Sorting
   ( sortByAbsolutePath
   ) where

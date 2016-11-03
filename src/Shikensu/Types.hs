@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
 module Shikensu.Types where
 
 import Data.Aeson (Object)

@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
 module Shikensu
   ( list
 
@@ -22,9 +21,9 @@ module Shikensu
     dictionary_io :: IO Dictionary
     dictionary_io =
       Shikensu.list ["**/*.html"] absolute_path_to_cwd
-        |> read
+        |> fmap read
         |> fmap flow
-        |> write "./build"
+        |> fmap (write "./build")
 
 
     flow =

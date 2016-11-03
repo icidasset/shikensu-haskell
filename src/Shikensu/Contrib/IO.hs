@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
 module Shikensu.Contrib.IO
   ( Shikensu.Contrib.IO.read
   , Shikensu.Contrib.IO.readDef

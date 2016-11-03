@@ -30,6 +30,9 @@ library
   default-language:
     Haskell2010
 
+  default-extensions:
+    OverloadedStrings
+
   hs-source-dirs:
     src
 

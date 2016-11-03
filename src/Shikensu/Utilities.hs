@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
 module Shikensu.Utilities
   ( cleanPath
   , commonDirectory
