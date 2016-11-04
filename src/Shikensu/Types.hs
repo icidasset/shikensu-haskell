@@ -1,6 +1,6 @@
 module Shikensu.Types where
 
-import Data.Aeson (Object)
+import Data.Aeson (ToJSON, Object, (.=), object, toJSON)
 import Data.Text (Text)
 import System.FilePath (joinPath)
 
@@ -22,6 +22,19 @@ data Definition =
     , parentPath :: Maybe FilePath
     , pathToRoot :: FilePath
     } deriving (Show)
+
+
+instance ToJSON Definition where
+  toJSON def =
+    object
+      [ "basename"        .= basename def
+      , "dirname"         .= dirname def
+      , "extname"         .= extname def
+      , "pattern"         .= pattern def
+      , "workingDirname"  .= workingDirname def
+      , "parentPath"      .= parentPath def
+      , "pathToRoot"      .= pathToRoot def
+      ]
 
 
 

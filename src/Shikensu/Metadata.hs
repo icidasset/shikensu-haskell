@@ -43,7 +43,7 @@ transposeMetadata hashMap fallback =
 
 {-| Inverse of `transposeMetadata`.
 -}
-transposeToMetadata :: (Aeson.ToJSON a, Aeson.FromJSON a) => a -> Metadata
+transposeToMetadata :: (Aeson.ToJSON a) => a -> Metadata
 transposeToMetadata generic =
   let
     result = generic

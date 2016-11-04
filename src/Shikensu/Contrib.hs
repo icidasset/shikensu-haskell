@@ -1,5 +1,9 @@
 module Shikensu.Contrib
-  ( clone
+  ( clearMetadata
+  , clearMetadataDef
+  , clone
+  , copyPropsToMetadata
+  , copyPropsToMetadataDef
   , insertMetadata
   , insertMetadataDef
   , permalink
@@ -17,14 +21,26 @@ module Shikensu.Contrib
 import Data.Text (Text)
 import Flow
 import Shikensu (forkDefinition)
+import Shikensu.Metadata (transposeToMetadata)
 import Shikensu.Types
-import Shikensu.Utilities (cleanPath)
+import Shikensu.Utilities (cleanPath, compileParentPath, compilePathToRoot)
 import System.FilePath (FilePath, combine)
 
-import qualified Data.HashMap.Strict as HashMap (union)
+import qualified Data.HashMap.Strict as HashMap (empty, union)
 
 
-{-| Clone
+{-| Clear metadata.
+-}
+clearMetadata :: Dictionary -> Dictionary
+clearMetadata = fmap (clearMetadataDef)
+
+
+clearMetadataDef :: Definition -> Definition
+clearMetadataDef def = def { metadata = HashMap.empty }
+
+
+
+{-| Clone.
 -}
 clone :: FilePath -> FilePath -> Dictionary -> Dictionary
 clone existingPath newPath dict =
@@ -38,7 +54,20 @@ clone existingPath newPath dict =
 
 
 
-{-| Insert metadata
+{-| Copy definition properties into the metadata.
+-}
+copyPropsToMetadata :: Dictionary -> Dictionary
+copyPropsToMetadata = fmap (copyPropsToMetadataDef)
+
+
+copyPropsToMetadataDef :: Definition -> Definition
+copyPropsToMetadataDef def = def {
+    metadata = HashMap.union (transposeToMetadata def) (metadata def)
+  }
+
+
+
+{-| Insert metadata.
 -}
 insertMetadata :: Metadata -> Dictionary -> Dictionary
 insertMetadata a = fmap (insertMetadataDef a)
@@ -49,7 +78,7 @@ insertMetadataDef given def = def { metadata = HashMap.union given (metadata def
 
 
 
-{-| Permalink
+{-| Permalink.
 -}
 permalink :: String -> Dictionary -> Dictionary
 permalink a = fmap (permalinkDef a)
@@ -62,14 +91,20 @@ permalinkDef newBasename def =
       let
         newDirname = cleanPath $ combine (dirname def) (basename def)
       in
-        def { basename = newBasename, dirname = newDirname }
+        def {
+          basename    = newBasename
+        , dirname     = newDirname
+
+        , parentPath  = compileParentPath $ newDirname
+        , pathToRoot  = compilePathToRoot $ newDirname
+        }
 
     else
       def
 
 
 
-{-| Rename
+{-| Rename.
 -}
 rename :: FilePath -> FilePath -> Dictionary -> Dictionary
 rename a b = fmap (renameDef a b)
@@ -83,7 +118,7 @@ renameDef oldPath newPath def =
 
 
 
-{-| Rename extension
+{-| Rename extension.
 -}
 renameExt :: String -> String -> Dictionary -> Dictionary
 renameExt a b = fmap (renameExtDef a b)
@@ -97,7 +132,7 @@ renameExtDef oldExtname newExtname def =
 
 
 
-{-| Render content
+{-| Render content.
 -}
 renderContent :: (Definition -> Maybe Text) -> Dictionary -> Dictionary
 renderContent a = fmap (renderContentDef a)
@@ -108,7 +143,7 @@ renderContentDef renderer def = def { content = renderer def }
 
 
 
-{-| Replace metadata
+{-| Replace metadata.
 -}
 replaceMetadata :: Metadata -> Dictionary -> Dictionary
 replaceMetadata a = fmap (replaceMetadataDef a)

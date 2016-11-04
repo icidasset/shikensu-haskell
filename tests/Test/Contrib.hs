@@ -88,12 +88,16 @@ testMetadata =
     keyC        = Text.pack "removed"
     valueC      = Aeson.String (Text.pack "Me.")
 
+    keyBase     = Text.pack "basename"
+    valueBase   = Aeson.String (Text.pack "example")
+
     -- 1. Insert C
     -- 2. Replace with A
     -- 3. Insert B
     dictionary = example_md
       <&> ( Contrib.insertMetadata (HashMap.fromList [ (keyC, valueC) ])
          .> Contrib.replaceMetadata (HashMap.fromList [ (keyA, valueA) ])
+         .> Contrib.copyPropsToMetadata
          .> Contrib.insertMetadata (HashMap.fromList [ (keyB, valueB) ])
       )
 
@@ -102,6 +106,7 @@ testMetadata =
     lookupTitle = \def -> HashMap.lookup keyA (Shikensu.metadata def)
     lookupHello = \def -> HashMap.lookup keyB (Shikensu.metadata def)
     lookupRemoved = \def -> HashMap.lookup keyC (Shikensu.metadata def)
+    lookupBasename = \def -> HashMap.lookup keyBase (Shikensu.metadata def)
   in
     testGroup
       "Metadata"
@@ -113,6 +118,9 @@ testMetadata =
 
       , testCase "Should have `title` key"
         $ definition `rmap` lookupTitle >>= assertEq (Just valueA)
+
+      , testCase "Should have `basename` key"
+        $ definition `rmap` lookupBasename >>= assertEq (Just valueBase)
       ]
 
 
@@ -123,8 +131,17 @@ testPermalink =
     dictionary = fmap (Contrib.permalink "index") example_md
     definition = fmap (List.head) dictionary
   in
-    testCase "Should `permalink`"
-      $ definition `rmap` Shikensu.localPath >>= assertEq "example/index.md"
+    testGroup
+      "Permalink"
+      [ testCase "Should have the correct `localPath`"
+        $ definition `rmap` Shikensu.localPath >>= assertEq "example/index.md"
+
+      , testCase "Should have the correct `parentPath`"
+        $ definition `rmap` Shikensu.parentPath >>= assertEq (Just "../")
+
+      , testCase "Should have the correct `pathToRoot`"
+        $ definition `rmap` Shikensu.pathToRoot >>= assertEq "../"
+      ]
 
 
 
