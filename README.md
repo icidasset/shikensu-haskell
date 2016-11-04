@@ -6,7 +6,6 @@ __Work in progress__.
 
 ### To do
 
-- `exclude "src/example.html"`, which removes definitions from the list
-- Write more documentation
+- Write more inline documentation
 - Support binary data (`content` property)
-- Test on Windows and other systems
+- Test on Windows (to be clear, it is supported)

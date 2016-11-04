@@ -23,6 +23,7 @@ contribTests :: TestTree
 contribTests = testGroup
   "Contrib tests"
   [ testClone
+  , testExclude
   , testMetadata
   , testPermalink
   , testRead
@@ -73,6 +74,17 @@ testClone =
   in
     testCase "Should `clone`"
       $ definition `rmap` Shikensu.localPath >>= assertEq "cloned.md"
+
+
+
+testExclude :: TestTree
+testExclude =
+  let
+    dictionary = fmap (Contrib.exclude "example.md") example_md
+    length_ = fmap length dictionary
+  in
+    testCase "Should `exclude`"
+      $ length_ >>= assertEq 0
 
 
 

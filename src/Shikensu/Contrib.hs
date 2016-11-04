@@ -4,6 +4,7 @@ module Shikensu.Contrib
   , clone
   , copyPropsToMetadata
   , copyPropsToMetadataDef
+  , exclude
   , insertMetadata
   , insertMetadataDef
   , permalink
@@ -64,6 +65,13 @@ copyPropsToMetadataDef :: Definition -> Definition
 copyPropsToMetadataDef def = def {
     metadata = HashMap.union (transposeToMetadata def) (metadata def)
   }
+
+
+
+{-| Exclude.
+-}
+exclude :: FilePath -> Dictionary -> Dictionary
+exclude path = filter (\def -> (localPath def) /= path)
 
 
 
