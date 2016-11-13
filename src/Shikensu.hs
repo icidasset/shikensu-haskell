@@ -21,15 +21,19 @@ module Shikensu
     dictionary_io :: IO Dictionary
     dictionary_io =
       Shikensu.list ["**/*.html"] absolute_path_to_cwd
-        |> fmap read
-        |> fmap flow
-        |> fmap (write "./build")
+        >>= read
+        >>= flow
+        >>= write "./build"
 
 
+    flow :: IO Dictionary
     flow =
          renameExt ".mustache" ".html"
       .> permalink "index"
       .> clone "index.html" "200.html"
+      .> copyPropsToMetadata
+      .> renderContent (\def -> Markdown.render $ content def)
+      .> return
 
 -}
 

@@ -7,7 +7,7 @@ module Shikensu.Sorting
 
 Example:
 
-        Data.List.sortBy Shikensu.sortByAbsolutePath dictionary
+    Data.List.sortBy Shikensu.sortByAbsolutePath dictionary
 
 -}
 

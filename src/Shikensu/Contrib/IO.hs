@@ -16,7 +16,10 @@ import qualified Data.Text.IO as Text (readFile, writeFile)
 import qualified Shikensu.Utilities as Utilities (mapIO)
 
 
-{-| Read
+{-| Read.
+
+Read the contents of each file, and for each file (ie. definition)
+put that content in the `content` property.
 -}
 read :: Dictionary -> IO Dictionary
 read = Utilities.mapIO (readDef)
@@ -30,7 +33,10 @@ readDef def =
 
 
 
-{-| Write
+{-| Write.
+
+Write the contents of each definition to a file.
+The path of the new file is `joinPath [rootDirname, givenDirectoryName, localPath]`.
 -}
 write :: FilePath -> Dictionary -> IO Dictionary
 write dest = Utilities.mapIO (writeDef dest)

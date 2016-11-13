@@ -31,6 +31,8 @@ import qualified Data.HashMap.Strict as HashMap (empty, union)
 
 
 {-| Clear metadata.
+
+Replace the current hash map with an empty one.
 -}
 clearMetadata :: Dictionary -> Dictionary
 clearMetadata = fmap (clearMetadataDef)
@@ -42,6 +44,14 @@ clearMetadataDef def = def { metadata = HashMap.empty }
 
 
 {-| Clone.
+
+For each definition that has the given `localPath` (1st argument),
+make a clone with a new `localPath` (2nd argument),
+and add that into dictionary just after the matching definition.
+
+Example:
+
+    clone "index.html" "200.html" dictionary
 -}
 clone :: FilePath -> FilePath -> Dictionary -> Dictionary
 clone existingPath newPath dict =
@@ -56,6 +66,9 @@ clone existingPath newPath dict =
 
 
 {-| Copy definition properties into the metadata.
+
+See the `toJSON` implementation for `Definition` in `Shikensu.Types`
+to see what properties get put in here.
 -}
 copyPropsToMetadata :: Dictionary -> Dictionary
 copyPropsToMetadata = fmap (copyPropsToMetadataDef)
@@ -69,6 +82,8 @@ copyPropsToMetadataDef def = def {
 
 
 {-| Exclude.
+
+Filter out the definitions that have the given `localPath`.
 -}
 exclude :: FilePath -> Dictionary -> Dictionary
 exclude path = filter (\def -> (localPath def) /= path)
@@ -76,6 +91,8 @@ exclude path = filter (\def -> (localPath def) /= path)
 
 
 {-| Insert metadata.
+
+Merge the current hash map with another one.
 -}
 insertMetadata :: Metadata -> Dictionary -> Dictionary
 insertMetadata a = fmap (insertMetadataDef a)
@@ -87,6 +104,14 @@ insertMetadataDef given def = def { metadata = HashMap.union given (metadata def
 
 
 {-| Permalink.
+
+Append the basename to the dirname,
+and change the basename to the given string.
+It will NOT change definitions that already have the new basename.
+
+Example:
+
+    permalink "index" dictionary
 -}
 permalink :: String -> Dictionary -> Dictionary
 permalink a = fmap (permalinkDef a)
@@ -113,6 +138,13 @@ permalinkDef newBasename def =
 
 
 {-| Rename.
+
+Change the `localPath` of the definitions that match a given `localPath`.
+For example, if you have a definition with the local path `a/b/example.html`:
+
+    rename "a/b/example.html" "example/index.html" dictionary
+
+See `Shikensu.localPath` for more info.
 -}
 rename :: FilePath -> FilePath -> Dictionary -> Dictionary
 rename a b = fmap (renameDef a b)
@@ -127,6 +159,12 @@ renameDef oldPath newPath def =
 
 
 {-| Rename extension.
+
+Example:
+
+    renameExt ".markdown" ".html" dictionary
+    -- The definitions that had the extname ".markdown"
+    -- now have the extname ".html"
 -}
 renameExt :: String -> String -> Dictionary -> Dictionary
 renameExt a b = fmap (renameExtDef a b)
@@ -141,6 +179,11 @@ renameExtDef oldExtname newExtname def =
 
 
 {-| Render content.
+
+Replace the content property by providing a renderer.
+A renderer is a function with the signature `Definition -> Maybe Text`.
+
+You can use this to render templates, markdown, etc.
 -}
 renderContent :: (Definition -> Maybe Text) -> Dictionary -> Dictionary
 renderContent a = fmap (renderContentDef a)
@@ -152,6 +195,8 @@ renderContentDef renderer def = def { content = renderer def }
 
 
 {-| Replace metadata.
+
+Replace the current hash map with another one.
 -}
 replaceMetadata :: Metadata -> Dictionary -> Dictionary
 replaceMetadata a = fmap (replaceMetadataDef a)
