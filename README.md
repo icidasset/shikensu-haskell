@@ -36,5 +36,4 @@ flow =
 
 ### To do
 
-- Support binary data (`content` property)
 - Test on Windows (to be clear, it is supported)

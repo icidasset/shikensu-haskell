@@ -19,7 +19,7 @@ module Shikensu.Contrib
   , replaceMetadataDef
   ) where
 
-import Data.Text (Text)
+import Data.ByteString (ByteString)
 import Flow
 import Shikensu (forkDefinition)
 import Shikensu.Metadata (transposeToMetadata)
@@ -181,15 +181,15 @@ renameExtDef oldExtname newExtname def =
 {-| Render content.
 
 Replace the content property by providing a renderer.
-A renderer is a function with the signature `Definition -> Maybe Text`.
+A renderer is a function with the signature `Definition -> Maybe ByteString`.
 
 You can use this to render templates, markdown, etc.
 -}
-renderContent :: (Definition -> Maybe Text) -> Dictionary -> Dictionary
+renderContent :: (Definition -> Maybe ByteString) -> Dictionary -> Dictionary
 renderContent a = fmap (renderContentDef a)
 
 
-renderContentDef :: (Definition -> Maybe Text) -> Definition -> Definition
+renderContentDef :: (Definition -> Maybe ByteString) -> Definition -> Definition
 renderContentDef renderer def = def { content = renderer def }
 
 

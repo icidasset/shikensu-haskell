@@ -1,7 +1,6 @@
 module Test.Contrib (contribTests) where
 
-import Data.Maybe (fromMaybe)
-import Data.Text (Text)
+import Data.ByteString (ByteString)
 import Flow
 import System.FilePath (joinPath)
 import Test.Helpers
@@ -9,10 +8,13 @@ import Test.Tasty
 import Test.Tasty.HUnit
 
 import qualified Data.Aeson.Types as Aeson (Value(..))
+import qualified Data.ByteString as B (empty)
+import qualified Data.ByteString.Char8 as BS (intercalate, pack)
 import qualified Data.HashMap.Strict as HashMap (fromList, lookup)
 import qualified Data.List as List (head, reverse)
-import qualified Data.Text as Text (intercalate, pack, unpack)
+import qualified Data.Text as Text (pack, unpack)
 import qualified Data.Text.IO as Text (readFile)
+import qualified Data.Text.Encoding as Text (decodeUtf8)
 import qualified Shikensu
 import qualified Shikensu.Contrib as Contrib
 import qualified Shikensu.Contrib.IO as Contrib.IO
@@ -47,18 +49,15 @@ example_md :: IO Shikensu.Dictionary
 example_md = list "tests/fixtures/example.md"
 
 
-renderer :: Shikensu.Definition -> Maybe Text
+renderer :: Shikensu.Definition -> Maybe ByteString
 renderer def =
   let
-    emptyText = Text.pack ""
+    openingTag = BS.pack "<html>"
+    closingTag = BS.pack "</html>"
   in
-    Text.intercalate
-      emptyText
-      [ Text.pack "<html>"
-      , fromMaybe emptyText (Shikensu.content def)
-      , Text.pack "</html>"
-      ]
-      |> Just
+    def
+      |> Shikensu.content
+      |> fmap (\c -> BS.intercalate B.empty [openingTag, c, closingTag])
 
 
 
@@ -164,7 +163,10 @@ testRead =
     definition = fmap List.head dictionary
   in
     testCase "Should `read`"
-      $ definition `rmap` Shikensu.content >>= assertEq (Just (Text.pack "# Example\n"))
+      $ definition
+        <&> Shikensu.content
+        <&> fmap Text.decodeUtf8
+        >>= assertEq (Just (Text.pack "# Example\n"))
 
 
 
@@ -198,7 +200,10 @@ testRenderContent =
     expectedResult = Just (Text.pack "<html># Example\n</html>")
   in
     testCase "Should `renderContent`"
-      $ definition `rmap` Shikensu.content >>= assertEq expectedResult
+      $ definition
+        <&> Shikensu.content
+        <&> fmap Text.decodeUtf8
+        >>= assertEq expectedResult
 
 
 

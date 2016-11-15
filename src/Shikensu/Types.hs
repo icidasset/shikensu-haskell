@@ -1,7 +1,7 @@
 module Shikensu.Types where
 
 import Data.Aeson (ToJSON, Object, (.=), object, toJSON)
-import Data.Text (Text)
+import Data.ByteString (ByteString)
 import System.FilePath (joinPath)
 
 
@@ -17,7 +17,7 @@ data Definition =
     , workingDirname :: FilePath
 
     -- Additional properties
-    , content :: Maybe Text
+    , content :: Maybe ByteString
     , metadata :: Metadata
     , parentPath :: Maybe FilePath
     , pathToRoot :: FilePath
