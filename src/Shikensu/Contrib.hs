@@ -9,6 +9,8 @@ module Shikensu.Contrib
   , insertMetadataDef
   , permalink
   , permalinkDef
+  , prefixDirname
+  , prefixDirnameDef
   , rename
   , renameDef
   , renameExt
@@ -134,6 +136,19 @@ permalinkDef newBasename def =
 
     else
       def
+
+
+
+{-| Prefix dirname.
+
+Prefix the dirname of each definition with a given string.
+-}
+prefixDirname :: String -> Dictionary -> Dictionary
+prefixDirname prefix = fmap (prefixDirnameDef prefix)
+
+
+prefixDirnameDef :: String -> Definition -> Definition
+prefixDirnameDef prefix def = def { dirname = prefix ++ (dirname def) }
 
 
 

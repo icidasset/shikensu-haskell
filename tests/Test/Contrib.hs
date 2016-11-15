@@ -28,6 +28,7 @@ contribTests = testGroup
   , testExclude
   , testMetadata
   , testPermalink
+  , testPrefixDirname
   , testRead
   , testRename
   , testRenameExt
@@ -153,6 +154,17 @@ testPermalink =
       , testCase "Should have the correct `pathToRoot`"
         $ definition `rmap` Shikensu.pathToRoot >>= assertEq "../"
       ]
+
+
+
+testPrefixDirname :: TestTree
+testPrefixDirname =
+  let
+    dictionary = fmap (Contrib.prefixDirname "prefix/") (list "tests/**/example.md")
+    definition = fmap List.head dictionary
+  in
+    testCase "Should `prefixDirname`"
+      $ definition `rmap` Shikensu.dirname >>= assertEq "prefix/fixtures"
 
 
 
