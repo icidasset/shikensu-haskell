@@ -74,6 +74,7 @@ test-suite tests
 
   other-modules:
     Test.Contrib,
+    Test.Example,
     Test.Helpers,
     Test.Shikensu
 

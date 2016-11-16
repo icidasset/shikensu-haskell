@@ -6,30 +6,41 @@ A small toolset for building static websites.
 
 
 ```haskell
-
+import qualified Data.Text.Encoding as Text (decodeUtf8, encodeUtf8)
 import qualified Shikensu
 
-import Shikensu.Types (Definition, Dictionary)
-import Shikensu.Contrib (clone, renameExt, permalink)
+import Data.ByteString (ByteString)
+import Flow
+import Prelude hiding (read)
+import Shikensu.Types
+import Shikensu.Contrib
 import Shikensu.Contrib.IO (read, write)
 
 
 dictionary_io :: IO Dictionary
 dictionary_io =
-  Shikensu.list ["**/*.html"] absolute_path_to_cwd
+  Shikensu.list ["src/**/*.md"] absolute_path_to_cwd
     >>= read
     >>= flow
     >>= write "./build"
 
 
-flow :: IO Dictionary
+flow :: Dictionary -> IO Dictionary
 flow =
-     renameExt ".mustache" ".html"
+     renameExt ".md" ".html"
   .> permalink "index"
   .> clone "index.html" "200.html"
   .> copyPropsToMetadata
-  .> renderContent (\def -> Markdown.render $ content def)
+  .> renderContent markdownRenderer
   .> return
+
+
+markdownRenderer :: Definition -> Maybe ByteString
+markdownRenderer def =
+  content def
+    |> fmap Text.decodeUtf8
+    |> fmap Markdown.render
+    |> fmap Text.encodeUtf8
 ```
 
 

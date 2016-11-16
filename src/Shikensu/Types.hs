@@ -21,7 +21,7 @@ data Definition =
     , metadata :: Metadata
     , parentPath :: Maybe FilePath
     , pathToRoot :: FilePath
-    } deriving (Show)
+    } deriving (Eq, Show)
 
 
 instance ToJSON Definition where

@@ -8,7 +8,7 @@ module Shikensu.Contrib.IO
 import Data.Maybe (fromMaybe)
 import Flow
 import Shikensu.Types
-import System.Directory (createDirectoryIfMissing)
+import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath (FilePath, joinPath, takeDirectory)
 
 import qualified Data.ByteString as B (empty, readFile, writeFile)
@@ -26,9 +26,17 @@ read = Utilities.mapIO (readDef)
 
 readDef :: Definition -> IO Definition
 readDef def =
-  fmap
-    (\c -> def { content = Just c })
-    (B.readFile $ absolutePath def)
+  let
+    absPath = absolutePath def
+  in
+    doesFileExist absPath >>= \exists ->
+      if exists then
+        fmap
+          (\c -> def { content = Just c })
+          (B.readFile absPath)
+      else
+        return
+          def { content = Nothing }
 
 
 
@@ -48,5 +56,5 @@ writeDef dest def =
     cont = fromMaybe B.empty (content def)
   in
     createDirectoryIfMissing True (takeDirectory path)
-    >> B.writeFile path cont
-    >> return def
+      >> B.writeFile path cont
+      >> return def
