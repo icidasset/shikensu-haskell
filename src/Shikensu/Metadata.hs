@@ -1,11 +1,10 @@
+{-| Metadata functions.
+
+-}
 module Shikensu.Metadata
   ( transposeMetadata
   , transposeToMetadata
   ) where
-
-
-{-| Metadata functions.
--}
 
 import Flow
 import Shikensu.Types

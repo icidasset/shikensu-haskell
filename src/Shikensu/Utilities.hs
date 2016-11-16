@@ -1,3 +1,6 @@
+{-| Utilities, mainly for internal use.
+
+-}
 module Shikensu.Utilities
   ( cleanPath
   , commonDirectory

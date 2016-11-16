@@ -1,20 +1,20 @@
+{-| Sorting functions.
+
+-}
 module Shikensu.Sorting
   ( sortByAbsolutePath
   ) where
 
+import Shikensu.Types (Definition, absolutePath)
 
-{-| Sorting functions.
+
+{-| Sort by absolutePath.
 
 Example:
 
     Data.List.sortBy Shikensu.sortByAbsolutePath dictionary
 
 -}
-
-import Shikensu.Types (Definition, absolutePath)
-
-
-
 sortByAbsolutePath :: Definition -> Definition -> Ordering
 sortByAbsolutePath defA defB =
   compare (absolutePath defA) (absolutePath defB)

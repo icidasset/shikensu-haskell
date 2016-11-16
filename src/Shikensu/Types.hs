@@ -1,3 +1,6 @@
+{-| Types and path helpers.
+
+-}
 module Shikensu.Types where
 
 import Data.Aeson (ToJSON, Object, (.=), object, toJSON)

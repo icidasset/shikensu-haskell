@@ -1,3 +1,8 @@
+{-| Shikensu.
+
+See the README and tests for examples.
+
+-}
 module Shikensu
   ( list
 
@@ -5,13 +10,6 @@ module Shikensu
   , makeDefinition
   , makeDictionary
   ) where
-
-
-{-| Shikensu.
-
-See the README and tests for examples.
-
--}
 
 import Flow
 import Shikensu.Types

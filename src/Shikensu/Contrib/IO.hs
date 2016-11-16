@@ -1,3 +1,6 @@
+{-| Dictionary IO functions.
+
+-}
 module Shikensu.Contrib.IO
   ( Shikensu.Contrib.IO.read
   , Shikensu.Contrib.IO.readDef

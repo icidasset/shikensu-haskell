@@ -1,3 +1,6 @@
+{-| Dictionary functions.
+
+-}
 module Shikensu.Contrib
   ( clearMetadata
   , clearMetadataDef
