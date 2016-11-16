@@ -73,23 +73,24 @@ forkDefinition newLocalPath def =
 {-| Make a Definition.
 
 Example definition, given:
+
 - the root path `/Users/icidasset/Projects/shikensu`
 - the pattern `example/**/*.md`
 - the workspace path `example/test/hello.md`
 
-    Definition
-      { basename = "hello"
-      , dirname = "test"
-      , extname = ".md"
-      , pattern = "example/**/*.md"
-      , rootDirname = "/Users/icidasset/Projects/shikensu"
-      , workingDirname = "example"
-
-      , content = Nothing
-      , metadata = HashMap.empty
-      , parentPath = "../"
-      , pathToRoot = "../../"
-      }
+> Definition
+>   { basename = "hello"
+>   , dirname = "test"
+>   , extname = ".md"
+>   , pattern = "example/**/*.md"
+>   , rootDirname = "/Users/icidasset/Projects/shikensu"
+>   , workingDirname = "example"
+>
+>   , content = Nothing
+>   , metadata = HashMap.empty
+>   , parentPath = "../"
+>   , pathToRoot = "../../"
+>   }
 
 -}
 makeDefinition :: FilePath -> Pattern -> FilePath -> Definition

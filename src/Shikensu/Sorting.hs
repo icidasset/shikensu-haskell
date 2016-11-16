@@ -10,9 +10,7 @@ import Shikensu.Types (Definition, absolutePath)
 
 {-| Sort by absolutePath.
 
-Example:
-
-    Data.List.sortBy Shikensu.sortByAbsolutePath dictionary
+> Data.List.sortBy Shikensu.sortByAbsolutePath dictionary
 
 -}
 sortByAbsolutePath :: Definition -> Definition -> Ordering

@@ -27,9 +27,9 @@ import qualified System.FilePath.Glob as Glob
 
 {-| "Clean up" a path.
 
-`/directory/./nested/` -> `directory/nested`
-`./` -> ``
-`.` -> ``
+> `/directory/./nested/` -> `directory/nested`
+> `./` -> ``
+> `.` -> ``
 
 -}
 cleanPath :: FilePath -> FilePath
@@ -50,7 +50,7 @@ compilePatterns = List.map Glob.compile
 
 {-| Path to parent, when there is one.
 
-    Just "../" or Nothing
+> Just "../" or Nothing
 
 -}
 compileParentPath :: FilePath -> Maybe FilePath

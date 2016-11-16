@@ -54,9 +54,7 @@ For each definition that has the given `localPath` (1st argument),
 make a clone with a new `localPath` (2nd argument),
 and add that into dictionary just after the matching definition.
 
-Example:
-
-    clone "index.html" "200.html" dictionary
+> clone "index.html" "200.html" dictionary
 -}
 clone :: FilePath -> FilePath -> Dictionary -> Dictionary
 clone existingPath newPath dict =
@@ -114,9 +112,7 @@ Append the basename to the dirname,
 and change the basename to the given string.
 It will NOT change definitions that already have the new basename.
 
-Example:
-
-    permalink "index" dictionary
+> permalink "index" dictionary
 -}
 permalink :: String -> Dictionary -> Dictionary
 permalink a = fmap (permalinkDef a)
@@ -160,7 +156,7 @@ prefixDirnameDef prefix def = def { dirname = prefix ++ (dirname def) }
 Change the `localPath` of the definitions that match a given `localPath`.
 For example, if you have a definition with the local path `a/b/example.html`:
 
-    rename "a/b/example.html" "example/index.html" dictionary
+> rename "a/b/example.html" "example/index.html" dictionary
 
 See `Shikensu.localPath` for more info.
 -}
@@ -180,9 +176,9 @@ renameDef oldPath newPath def =
 
 Example:
 
-    renameExt ".markdown" ".html" dictionary
-    -- The definitions that had the extname ".markdown"
-    -- now have the extname ".html"
+> renameExt ".markdown" ".html" dictionary
+> -- The definitions that had the extname ".markdown"
+> -- now have the extname ".html"
 -}
 renameExt :: String -> String -> Dictionary -> Dictionary
 renameExt a b = fmap (renameExtDef a b)

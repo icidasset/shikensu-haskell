@@ -19,13 +19,13 @@ import qualified Data.HashMap.Strict as HashMap (empty)
 Transpose our metadata object to a given type
 which implements the Aeson.FromJSON instance.
 
-    data Example =
-      Example { some :: Text }
-      deriving (Generic, FromJSON)
-
-    hashMap     = HashMap.fromList [ ("some", "metadata") ]
-    defaultEx   = Example { some = "default" }
-    example     = transposeMetadata hashMap defaultExample :: Example
+> data Example =
+>   Example { some :: Text }
+>   deriving (Generic, FromJSON)
+>
+> hashMap     = HashMap.fromList [ ("some", "metadata") ]
+> defaultEx   = Example { some = "default" }
+> example     = transposeMetadata hashMap defaultExample :: Example
 
 -}
 transposeMetadata :: Aeson.FromJSON a => Metadata -> a -> a
