@@ -1,8 +1,2 @@
-flags: {}
 resolver: lts-7.5
-
-packages:
-- '.'
-
-extra-deps: []
-extra-package-dbs: []
+packages: ['.']

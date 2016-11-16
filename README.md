@@ -1,6 +1,7 @@
-# Shikensu
+# Shīkensu
 
-__Work in progress__.
+> シーケンス    
+> Sequence
 
 A small toolset for building static websites.
 
@@ -42,6 +43,16 @@ markdownRenderer def =
     |> fmap Markdown.render
     |> fmap Text.encodeUtf8
 ```
+
+
+
+### Why?
+
+Because this allows me to easily define a workflow for building a static website, and more specifically:
+
+- Have a clear overview of what's happening.
+- Do a bunch of actions in memory and then write it to disk in one go.
+- Have a list of information about the other files in the project which can then be shared with, for example, templates.
 
 
 
