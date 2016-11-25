@@ -147,7 +147,16 @@ prefixDirname prefix = fmap (prefixDirnameDef prefix)
 
 
 prefixDirnameDef :: String -> Definition -> Definition
-prefixDirnameDef prefix def = def { dirname = prefix ++ (dirname def) }
+prefixDirnameDef prefix def =
+  let
+    newDirname = prefix ++ (dirname def)
+  in
+    def {
+      dirname     = newDirname
+
+    , parentPath  = compileParentPath $ newDirname
+    , pathToRoot  = compilePathToRoot $ newDirname
+    }
 
 
 

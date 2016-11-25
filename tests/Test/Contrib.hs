@@ -163,8 +163,17 @@ testPrefixDirname =
     dictionary = fmap (Contrib.prefixDirname "prefix/") (list "tests/**/example.md")
     definition = fmap List.head dictionary
   in
-    testCase "Should `prefixDirname`"
-      $ definition `rmap` Shikensu.dirname >>= assertEq "prefix/fixtures"
+    testGroup
+      "PrefixDirname"
+      [ testCase "Should have the correct `dirname`"
+        $ definition `rmap` Shikensu.dirname >>= assertEq "prefix/fixtures"
+
+      , testCase "Should have the correct `pathToRoot`"
+        $ definition `rmap` Shikensu.pathToRoot >>= assertEq "../../"
+
+      , testCase "Should have the correct `parentPath`"
+        $ definition `rmap` Shikensu.parentPath >>= assertEq (Just "../")
+      ]
 
 
 
