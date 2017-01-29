@@ -35,8 +35,8 @@ import qualified Data.List as List (concat, map, zip)
 5. Merge the dictionaries into one dictionary.
 
 -}
-list :: FilePath -> [Pattern] -> IO Dictionary
-list rootDir patterns =
+list :: [Pattern] -> FilePath -> IO Dictionary
+list patterns rootDir =
     patterns
         |> compilePatterns
         |> globDir rootDir
@@ -45,9 +45,11 @@ list rootDir patterns =
         |> fmap (List.concat)
 
 
-listF :: [Pattern] -> FilePath -> IO Dictionary
-listF patterns rootDir =
-    list rootDir patterns
+{-| Flipped version of `list`.
+-}
+listF :: FilePath -> [Pattern] -> IO Dictionary
+listF rootDir patterns =
+    list patterns rootDir
 
 
 

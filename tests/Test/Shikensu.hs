@@ -24,7 +24,7 @@ testRegular :: TestTree
 testRegular =
     let
         pattern = "tests/**/*.md"
-        dictionary = fmap sort $ rootPath >>= Shikensu.listF [pattern]
+        dictionary = fmap sort $ rootPath >>= Shikensu.list [pattern]
         definition = fmap List.head dictionary
         localPath = "fixtures/example.md"
     in
@@ -54,7 +54,7 @@ testDot :: TestTree
 testDot =
     let
         pattern = "./tests/**/*.md"
-        dictionary = fmap sort $ rootPath >>= Shikensu.listF [pattern]
+        dictionary = fmap sort $ rootPath >>= Shikensu.list [pattern]
         definition = fmap List.head dictionary
         localPath = "fixtures/example.md"
     in
@@ -84,7 +84,7 @@ testWithoutWd :: TestTree
 testWithoutWd =
     let
         pattern = "**/*.md"
-        dictionary = fmap sort $ testsPath >>= Shikensu.listF [pattern]
+        dictionary = fmap sort $ testsPath >>= Shikensu.list [pattern]
         definition = fmap List.head dictionary
         localPath = "fixtures/example.md"
     in
@@ -114,7 +114,7 @@ testRootFile :: TestTree
 testRootFile =
     let
         pattern = "*.md"
-        dictionary = fmap sort $ rootPath >>= Shikensu.listF [pattern]
+        dictionary = fmap sort $ rootPath >>= Shikensu.list [pattern]
         definition = fmap List.head dictionary
         localPath = "CHANGELOG.md"
     in

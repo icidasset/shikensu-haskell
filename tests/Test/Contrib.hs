@@ -44,7 +44,7 @@ contribTests = testGroup
 
 list :: Shikensu.Pattern -> IO Shikensu.Dictionary
 list pattern =
-    rootPath >>= Shikensu.listF [pattern]
+    rootPath >>= Shikensu.list [pattern]
 
 
 example_md :: IO Shikensu.Dictionary

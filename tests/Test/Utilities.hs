@@ -30,8 +30,8 @@ testSequencing =
     let
         result =
             Utils.lsequence
-                [ ( "a", rootPath >>= Shikensu.listF ["tests/fixtures/example.md"] )
-                , ( "b", rootPath >>= Shikensu.listF ["tests/fixtures/example.md"] )
+                [ ( "a", rootPath >>= Shikensu.list ["tests/fixtures/example.md"] )
+                , ( "b", rootPath >>= Shikensu.list ["tests/fixtures/example.md"] )
                 ]
     in
         testCase "Test lsequence"
@@ -47,7 +47,7 @@ testThunder =
 
         dictionary =
             rootPath
-                >>= Shikensu.listF ["tests/fixtures/example.md"]
+                >>= Shikensu.list ["tests/fixtures/example.md"]
                 >>= flow
 
         def =

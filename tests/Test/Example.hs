@@ -36,7 +36,7 @@ exampleTests =
 
 dictionary_io :: String -> IO Dictionary
 dictionary_io absolutePathToCwd =
-    Shikensu.list absolutePathToCwd ["fixtures/*.md"]
+    Shikensu.list ["fixtures/*.md"] absolutePathToCwd
         >>= read
         >>= flow
         >>= write "./build"
