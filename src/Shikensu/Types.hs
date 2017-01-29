@@ -11,33 +11,33 @@ import System.FilePath (joinPath)
 {-| A file definition, along with some additional properties.
 -}
 data Definition =
-  Definition
-    { basename :: String
-    , dirname :: FilePath
-    , extname :: String
-    , pattern :: Pattern
-    , rootDirname :: FilePath
-    , workingDirname :: FilePath
+    Definition
+        { basename :: String
+        , dirname :: FilePath
+        , extname :: String
+        , pattern :: Pattern
+        , rootDirname :: FilePath
+        , workingDirname :: FilePath
 
-    -- Additional properties
-    , content :: Maybe ByteString
-    , metadata :: Metadata
-    , parentPath :: Maybe FilePath
-    , pathToRoot :: FilePath
-    } deriving (Eq, Show)
+        -- Additional properties
+        , content :: Maybe ByteString
+        , metadata :: Metadata
+        , parentPath :: Maybe FilePath
+        , pathToRoot :: FilePath
+        } deriving (Eq, Show)
 
 
 instance ToJSON Definition where
-  toJSON def =
-    object
-      [ "basename"        .= basename def
-      , "dirname"         .= dirname def
-      , "extname"         .= extname def
-      , "pattern"         .= pattern def
-      , "workingDirname"  .= workingDirname def
-      , "parentPath"      .= parentPath def
-      , "pathToRoot"      .= pathToRoot def
-      ]
+    toJSON def =
+        object
+            [ "basename"        .= basename def
+            , "dirname"         .= dirname def
+            , "extname"         .= extname def
+            , "pattern"         .= pattern def
+            , "workingDirname"  .= workingDirname def
+            , "parentPath"      .= parentPath def
+            , "pathToRoot"      .= pathToRoot def
+            ]
 
 
 
@@ -57,14 +57,14 @@ type Pattern = String
 
 absolutePath :: Definition -> String
 absolutePath def =
-  joinPath [rootDirname def, workspacePath def]
+    joinPath [rootDirname def, workspacePath def]
 
 
 localPath :: Definition -> String
 localPath def =
-  joinPath [dirname def, (basename def) ++ (extname def)]
+    joinPath [dirname def, (basename def) ++ (extname def)]
 
 
 workspacePath :: Definition -> String
 workspacePath def =
-  joinPath [workingDirname def, localPath def]
+    joinPath [workingDirname def, localPath def]

@@ -2,34 +2,34 @@
 
 -}
 module Shikensu.Contrib
-  ( clearMetadata
-  , clearMetadataDef
-  , clone
-  , copyPropsToMetadata
-  , copyPropsToMetadataDef
-  , exclude
-  , insertMetadata
-  , insertMetadataDef
-  , permalink
-  , permalinkDef
-  , prefixDirname
-  , prefixDirnameDef
-  , rename
-  , renameDef
-  , renameExt
-  , renameExtDef
-  , renderContent
-  , renderContentDef
-  , replaceMetadata
-  , replaceMetadataDef
-  ) where
+    ( clearMetadata
+    , clearMetadataDef
+    , clone
+    , copyPropsToMetadata
+    , copyPropsToMetadataDef
+    , exclude
+    , insertMetadata
+    , insertMetadataDef
+    , permalink
+    , permalinkDef
+    , prefixDirname
+    , prefixDirnameDef
+    , rename
+    , renameDef
+    , renameExt
+    , renameExtDef
+    , renderContent
+    , renderContentDef
+    , replaceMetadata
+    , replaceMetadataDef
+    ) where
 
 import Data.ByteString (ByteString)
 import Flow
 import Shikensu (forkDefinition)
+import Shikensu.Internal.Utilities (cleanPath, compileParentPath, compilePathToRoot)
 import Shikensu.Metadata (transposeToMetadata)
 import Shikensu.Types
-import Shikensu.Utilities (cleanPath, compileParentPath, compilePathToRoot)
 import System.FilePath (FilePath, combine)
 
 import qualified Data.HashMap.Strict as HashMap (empty, union)
@@ -40,11 +40,13 @@ import qualified Data.HashMap.Strict as HashMap (empty, union)
 Replace the current hash map with an empty one.
 -}
 clearMetadata :: Dictionary -> Dictionary
-clearMetadata = fmap (clearMetadataDef)
+clearMetadata =
+    fmap (clearMetadataDef)
 
 
 clearMetadataDef :: Definition -> Definition
-clearMetadataDef def = def { metadata = HashMap.empty }
+clearMetadataDef def =
+    def { metadata = HashMap.empty }
 
 
 
@@ -58,13 +60,13 @@ and add that into dictionary just after the matching definition.
 -}
 clone :: FilePath -> FilePath -> Dictionary -> Dictionary
 clone existingPath newPath dict =
-  let
-    makeNew = \def acc ->
-      if (localPath def) == existingPath
-        then acc ++ [forkDefinition newPath def]
-        else acc
-  in
-    dict ++ (foldr makeNew [] dict)
+    let
+        makeNew = \def acc ->
+            if (localPath def) == existingPath
+                then acc ++ [forkDefinition newPath def]
+                else acc
+    in
+        dict ++ (foldr makeNew [] dict)
 
 
 
@@ -74,13 +76,14 @@ See the `toJSON` implementation for `Definition` in `Shikensu.Types`
 to see what properties get put in here.
 -}
 copyPropsToMetadata :: Dictionary -> Dictionary
-copyPropsToMetadata = fmap (copyPropsToMetadataDef)
+copyPropsToMetadata =
+    fmap (copyPropsToMetadataDef)
 
 
 copyPropsToMetadataDef :: Definition -> Definition
-copyPropsToMetadataDef def = def {
-    metadata = HashMap.union (transposeToMetadata def) (metadata def)
-  }
+copyPropsToMetadataDef def =
+    def
+        { metadata = HashMap.union (transposeToMetadata def) (metadata def) }
 
 
 
@@ -89,7 +92,8 @@ copyPropsToMetadataDef def = def {
 Filter out the definitions that have the given `localPath`.
 -}
 exclude :: FilePath -> Dictionary -> Dictionary
-exclude path = filter (\def -> (localPath def) /= path)
+exclude path =
+    filter (\def -> (localPath def) /= path)
 
 
 
@@ -98,11 +102,13 @@ exclude path = filter (\def -> (localPath def) /= path)
 Merge the current hash map with another one.
 -}
 insertMetadata :: Metadata -> Dictionary -> Dictionary
-insertMetadata a = fmap (insertMetadataDef a)
+insertMetadata a =
+    fmap (insertMetadataDef a)
 
 
 insertMetadataDef :: Metadata -> Definition -> Definition
-insertMetadataDef given def = def { metadata = HashMap.union given (metadata def) }
+insertMetadataDef given def =
+    def { metadata = HashMap.union given (metadata def) }
 
 
 
@@ -115,26 +121,24 @@ It will NOT change definitions that already have the new basename.
 > permalink "index" dictionary
 -}
 permalink :: String -> Dictionary -> Dictionary
-permalink a = fmap (permalinkDef a)
+permalink a =
+    fmap (permalinkDef a)
 
 
 permalinkDef :: String -> Definition -> Definition
 permalinkDef newBasename def =
-  if (basename def) /= newBasename
-    then
-      let
-        newDirname = cleanPath $ combine (dirname def) (basename def)
-      in
-        def {
-          basename    = newBasename
-        , dirname     = newDirname
-
-        , parentPath  = compileParentPath $ newDirname
-        , pathToRoot  = compilePathToRoot $ newDirname
-        }
-
+    if (basename def) /= newBasename then
+        let
+            newDirname = cleanPath $ combine (dirname def) (basename def)
+        in
+            def
+                { basename    = newBasename
+                , dirname     = newDirname
+                , parentPath  = compileParentPath $ newDirname
+                , pathToRoot  = compilePathToRoot $ newDirname
+                }
     else
-      def
+        def
 
 
 
@@ -148,15 +152,14 @@ prefixDirname prefix = fmap (prefixDirnameDef prefix)
 
 prefixDirnameDef :: String -> Definition -> Definition
 prefixDirnameDef prefix def =
-  let
-    newDirname = prefix ++ (dirname def)
-  in
-    def {
-      dirname     = newDirname
-
-    , parentPath  = compileParentPath $ newDirname
-    , pathToRoot  = compilePathToRoot $ newDirname
-    }
+    let
+        newDirname = prefix ++ (dirname def)
+    in
+        def
+            { dirname     = newDirname
+            , parentPath  = compileParentPath $ newDirname
+            , pathToRoot  = compilePathToRoot $ newDirname
+            }
 
 
 
@@ -190,14 +193,15 @@ Example:
 > -- now have the extname ".html"
 -}
 renameExt :: String -> String -> Dictionary -> Dictionary
-renameExt a b = fmap (renameExtDef a b)
+renameExt a b =
+    fmap (renameExtDef a b)
 
 
 renameExtDef :: String -> String -> Definition -> Definition
 renameExtDef oldExtname newExtname def =
-  if (extname def) == oldExtname
-    then def { extname = newExtname }
-    else def
+    if (extname def) == oldExtname
+        then def { extname = newExtname }
+        else def
 
 
 
@@ -209,11 +213,13 @@ A renderer is a function with the signature `Definition -> Maybe ByteString`.
 You can use this to render templates, markdown, etc.
 -}
 renderContent :: (Definition -> Maybe ByteString) -> Dictionary -> Dictionary
-renderContent a = fmap (renderContentDef a)
+renderContent a =
+    fmap (renderContentDef a)
 
 
 renderContentDef :: (Definition -> Maybe ByteString) -> Definition -> Definition
-renderContentDef renderer def = def { content = renderer def }
+renderContentDef renderer def =
+    def { content = renderer def }
 
 
 
@@ -222,8 +228,10 @@ renderContentDef renderer def = def { content = renderer def }
 Replace the current hash map with another one.
 -}
 replaceMetadata :: Metadata -> Dictionary -> Dictionary
-replaceMetadata a = fmap (replaceMetadataDef a)
+replaceMetadata a =
+    fmap (replaceMetadataDef a)
 
 
 replaceMetadataDef :: Metadata -> Definition -> Definition
-replaceMetadataDef given def = def { metadata = given }
+replaceMetadataDef given def =
+    def { metadata = given }

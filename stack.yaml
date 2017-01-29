@@ -1,2 +1,2 @@
-resolver: lts-7.5
+resolver: lts-7.17
 packages: ['.']

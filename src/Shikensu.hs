@@ -4,16 +4,17 @@ See the README and tests for examples.
 
 -}
 module Shikensu
-  ( list
+    ( list
+    , listF
 
-  , forkDefinition
-  , makeDefinition
-  , makeDictionary
-  ) where
+    , forkDefinition
+    , makeDefinition
+    , makeDictionary
+    ) where
 
 import Flow
+import Shikensu.Internal.Utilities
 import Shikensu.Types
-import Shikensu.Utilities
 import System.FilePath
 
 import qualified Data.HashMap.Strict as HashMap (empty)
@@ -24,7 +25,7 @@ import qualified Data.List as List (concat, map, zip)
 -- IO
 
 
-{-| Make a single dictionary based on multiple glob patterns and a path to a directory.
+{-| Make a single dictionary based on a path to a directory and multiple glob patterns.
 
 1. Compile patterns so `globDir` can use them.
 2. Run `globDir` function on the given (root) path.
@@ -34,14 +35,19 @@ import qualified Data.List as List (concat, map, zip)
 5. Merge the dictionaries into one dictionary.
 
 -}
-list :: [Pattern] -> FilePath -> IO Dictionary
-list patterns rootDir =
-  patterns
-    |> compilePatterns
-    |> globDir rootDir
-    |> fmap (List.zip patterns)
-    |> fmap (List.map (uncurry . makeDictionary $ rootDir))
-    |> fmap (List.concat)
+list :: FilePath -> [Pattern] -> IO Dictionary
+list rootDir patterns =
+    patterns
+        |> compilePatterns
+        |> globDir rootDir
+        |> fmap (List.zip patterns)
+        |> fmap (List.map (uncurry . makeDictionary $ rootDir))
+        |> fmap (List.concat)
+
+
+listF :: [Pattern] -> FilePath -> IO Dictionary
+listF patterns rootDir =
+    list rootDir patterns
 
 
 
@@ -53,20 +59,20 @@ list patterns rootDir =
 -}
 forkDefinition :: FilePath -> Definition -> Definition
 forkDefinition newLocalPath def =
-  Definition
-    { basename        = takeBaseName newLocalPath
-    , dirname         = takeDirName newLocalPath
-    , extname         = takeExtension newLocalPath
-    , pattern         = (pattern def)
-    , rootDirname     = (rootDirname def)
-    , workingDirname  = (workingDirname def)
+    Definition
+        { basename        = takeBaseName newLocalPath
+        , dirname         = takeDirName newLocalPath
+        , extname         = takeExtension newLocalPath
+        , pattern         = (pattern def)
+        , rootDirname     = (rootDirname def)
+        , workingDirname  = (workingDirname def)
 
-    -- Additional properties
-    , content         = (content def)
-    , metadata        = (metadata def)
-    , parentPath      = compileParentPath $ takeDirName newLocalPath
-    , pathToRoot      = compilePathToRoot $ takeDirName newLocalPath
-    }
+        -- Additional properties
+        , content         = (content def)
+        , metadata        = (metadata def)
+        , parentPath      = compileParentPath $ takeDirName newLocalPath
+        , pathToRoot      = compilePathToRoot $ takeDirName newLocalPath
+        }
 
 
 
@@ -79,44 +85,45 @@ Example definition, given:
 - the workspace path `example/test/hello.md`
 
 > Definition
->   { basename = "hello"
->   , dirname = "test"
->   , extname = ".md"
->   , pattern = "example/**/*.md"
->   , rootDirname = "/Users/icidasset/Projects/shikensu"
->   , workingDirname = "example"
+>     { basename = "hello"
+>     , dirname = "test"
+>     , extname = ".md"
+>     , pattern = "example/**/*.md"
+>     , rootDirname = "/Users/icidasset/Projects/shikensu"
+>     , workingDirname = "example"
 >
->   , content = Nothing
->   , metadata = HashMap.empty
->   , parentPath = "../"
->   , pathToRoot = "../../"
->   }
+>     , content = Nothing
+>     , metadata = HashMap.empty
+>     , parentPath = "../"
+>     , pathToRoot = "../../"
+>     }
 
 -}
 makeDefinition :: FilePath -> Pattern -> FilePath -> Definition
 makeDefinition _rootDirname _pattern _workspacePath =
-  let
-    workingDir  = cleanPath . (commonDirectory) $ _pattern
-    localPath   = cleanPath . (stripPrefix workingDir) . cleanPath $ _workspacePath
-  in
-    Definition
-      { basename        = takeBaseName localPath
-      , dirname         = takeDirName localPath
-      , extname         = takeExtension localPath
-      , pattern         = _pattern
-      , rootDirname     = dropTrailingPathSeparator _rootDirname
-      , workingDirname  = workingDir
+    let
+        workingDir  = cleanPath . (commonDirectory) $ _pattern
+        localPath   = cleanPath . (stripPrefix workingDir) . cleanPath $ _workspacePath
+    in
+        Definition
+            { basename        = takeBaseName localPath
+            , dirname         = takeDirName localPath
+            , extname         = takeExtension localPath
+            , pattern         = _pattern
+            , rootDirname     = dropTrailingPathSeparator _rootDirname
+            , workingDirname  = workingDir
 
-      -- Additional properties
-      , content         = Nothing
-      , metadata        = HashMap.empty
-      , parentPath      = compileParentPath $ takeDirName localPath
-      , pathToRoot      = compilePathToRoot $ takeDirName localPath
-      }
+            -- Additional properties
+            , content         = Nothing
+            , metadata        = HashMap.empty
+            , parentPath      = compileParentPath $ takeDirName localPath
+            , pathToRoot      = compilePathToRoot $ takeDirName localPath
+            }
 
 
 
 {-| Make a Dictionary.
 -}
 makeDictionary :: FilePath -> Pattern -> [FilePath] -> Dictionary
-makeDictionary _rootDirname _pattern = List.map (makeDefinition _rootDirname _pattern)
+makeDictionary _rootDirname _pattern =
+    List.map (makeDefinition _rootDirname _pattern)

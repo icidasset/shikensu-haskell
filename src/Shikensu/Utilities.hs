@@ -1,120 +1,104 @@
-{-| Utilities, mainly for internal use.
-
--}
 module Shikensu.Utilities
-  ( cleanPath
-  , commonDirectory
-  , compilePatterns
-  , compileParentPath
-  , compilePathToRoot
-  , globDir
-  , io
-  , mapIO
-  , replaceSingleDot
-  , stripPrefix
-  , takeDirName
-  ) where
+    ( io
+    , mapIO
+    , lsequence
 
-import Data.Maybe (fromMaybe)
-import Data.Tuple (fst)
+    , (⚡)
+    , (⚡⚡)
+    ) where
+
+import Data.Aeson (FromJSON, ToJSON, fromJSON)
+import Data.Text (Text)
 import Flow
 import Shikensu.Types
-import System.FilePath
 
-import qualified Data.List as List (map, stripPrefix)
-import qualified System.FilePath.Glob as Glob
-
-
-{-| "Clean up" a path.
-
-> `/directory/./nested/` -> `directory/nested`
-> `./` -> ``
-> `.` -> ``
-
--}
-cleanPath :: FilePath -> FilePath
-cleanPath = normalise .> dropTrailingPathSeparator .> dropDrive .> replaceSingleDot
+import qualified Data.Aeson as Json (Object, Result(..), encode)
+import qualified Data.HashMap.Strict as HashMap (lookup)
+import qualified Data.List as List (unzip, zip)
+import qualified Data.Tuple as Tuple (fst, snd)
+import qualified Data.Text as Text (concat, unpack)
+import qualified Data.Text.Lazy as Lazy.Text (unpack)
+import qualified Data.Text.Lazy.Encoding as Lazy.Text (decodeUtf8)
 
 
-{-| Get the common directory from a Pattern.
--}
-commonDirectory :: Pattern -> FilePath
-commonDirectory pattern = (Glob.compile .> Glob.commonDirectory .> fst) pattern
-
-
-{-| Compile a list of `Pattern`s to `Glob.Pattern`s.
--}
-compilePatterns :: [Pattern] -> [Glob.Pattern]
-compilePatterns = List.map Glob.compile
-
-
-{-| Path to parent, when there is one.
-
-> Just "../" or Nothing
-
--}
-compileParentPath :: FilePath -> Maybe FilePath
-compileParentPath dirname =
-  case dirname of
-    "" -> Nothing
-    _  -> Just "../"
-
-
-{-| Path to root.
-
-Example, if `dirname` is 'example/subdir',
-then this will be `../../`.
-
-If the `dirname` is empty,
-then this will be empty as well.
-
--}
-compilePathToRoot :: FilePath -> FilePath
-compilePathToRoot dirname =
-  if dirname == "" then
-    ""
-  else
-    dirname
-      |> splitDirectories
-      |> fmap (\_ -> "..")
-      |> joinPath
-      |> addTrailingPathSeparator
-
-
-{-| List contents of a directory using a glob pattern.
-Returns a relative path, based on the given rootDirname.
--}
-globDir :: FilePath -> [Glob.Pattern] -> IO [[FilePath]]
-globDir rootDir patterns =
-  Glob.globDir patterns rootDir
-    |> fmap (fst)
-    |> fmap (List.map . List.map . makeRelative $ rootDir)
+-- IO
 
 
 {-| IO Sequence helpers
 -}
 io :: ([Definition] -> [IO Definition]) -> Dictionary -> IO Dictionary
-io fn = sequence . fn
+io fn =
+    fn .> sequence
 
 
 mapIO :: (Definition -> IO Definition) -> Dictionary -> IO Dictionary
-mapIO = io . fmap
+mapIO =
+    fmap .> io
 
 
-{-| If the path is a single dot, return an empty string.
-Otherwise return the path.
+{-| One way to deal with multiple dictionaries.
+
+> lsequence
+>     [ ( "pages", Shikensu.list rootDir ["src/pages/**/*.html"]    )
+>     , ( "js",    Shikensu.list rootDir ["src/javascript/**/*.js"] )
+>     ]
+
+From multiple IO monads to a single IO monad.
 -}
-replaceSingleDot :: String -> String
-replaceSingleDot path = if path == "." then "" else path
+lsequence :: Monad m => [( String, m a )] -> m [( String, a )]
+lsequence list =
+    let
+        unzippedList =
+            List.unzip list
+
+        identifiers =
+            Tuple.fst unzippedList
+
+        dictionaries =
+            Tuple.snd unzippedList
+    in
+        dictionaries
+            |> sequence
+            |> fmap (List.zip identifiers)
 
 
-{-| Strip prefix.
+
+-- PURE
+
+
+{-| Get stuff out of the metadata.
+    Return a `Maybe`.
 -}
-stripPrefix :: String -> String -> String
-stripPrefix prefix target = fromMaybe target (List.stripPrefix prefix target)
+(⚡) :: (FromJSON a, ToJSON a) => Metadata -> Text -> Maybe a
+(⚡) obj key =
+    HashMap.lookup key obj
+        |> fmap fromJSON
+        |> fmap fromJSONResult
 
 
-{-| Take dirname.
+{-| Get stuff out of the metadata.
+    Does NOT return a `Maybe`, but gives an error if it isn't found.
 -}
-takeDirName :: FilePath -> FilePath
-takeDirName = replaceSingleDot . takeDirectory
+(⚡⚡) :: (FromJSON a, ToJSON a) => Metadata -> Text -> a
+(⚡⚡) obj key =
+    case (obj ⚡ key) of
+        Just x  -> x
+        Nothing -> error <|
+            "Could not find the key `" ++ (Text.unpack key)         ++ "` " ++
+            "on the metadata object `" ++ (aesonObjectToString obj) ++ "` using (⚡⚡)"
+
+
+
+-- Private
+
+
+fromJSONResult :: ToJSON a => Json.Result a -> a
+fromJSONResult result =
+    case result of
+        Json.Success x -> x
+        Json.Error err -> error err
+
+
+aesonObjectToString :: Json.Object -> String
+aesonObjectToString =
+    Json.encode .> Lazy.Text.decodeUtf8 .> Lazy.Text.unpack

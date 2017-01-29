@@ -19,15 +19,15 @@ import Shikensu.Contrib.IO (read, write)
 
 exampleTests :: TestTree
 exampleTests =
-  let
-    path = canonicalizePath "./tests"
-    dict = path >>= dictionary_io
-    test = path >>= \p ->
-      read [Shikensu.makeDefinition p "fixtures/*.md" "fixtures/example.md"]
-      >>= flow
-  in
-    testCase "Example test"
-      $ dict >>= \d -> test >>= assertEq d
+    let
+        path = canonicalizePath "./tests"
+        dict = path >>= dictionary_io
+        test = path >>= \p ->
+            read [Shikensu.makeDefinition p "fixtures/*.md" "fixtures/example.md"]
+            >>= flow
+    in
+        testCase "Example test"
+        $ dict >>= \d -> test >>= assertEq d
 
 
 
@@ -36,29 +36,30 @@ exampleTests =
 
 dictionary_io :: String -> IO Dictionary
 dictionary_io absolutePathToCwd =
-  Shikensu.list ["fixtures/*.md"] absolutePathToCwd
-    >>= read
-    >>= flow
-    >>= write "./build"
+    Shikensu.list absolutePathToCwd ["fixtures/*.md"]
+        >>= read
+        >>= flow
+        >>= write "./build"
 
 
 flow :: Dictionary -> IO Dictionary
 flow =
-     renameExt ".md" ".html"
-  .> permalink "index"
-  .> clone "index.html" "200.html"
-  .> copyPropsToMetadata
-  .> renderContent markdownRenderer
-  .> return
+       renameExt ".md" ".html"
+    .> permalink "index"
+    .> clone "index.html" "200.html"
+    .> copyPropsToMetadata
+    .> renderContent markdownRenderer
+    .> return
 
 
 markdownRenderer :: Definition -> Maybe ByteString
 markdownRenderer def =
-  content def
-    |> fmap Text.decodeUtf8
-    |> fmap renderMarkdown
-    |> fmap Text.encodeUtf8
+    content def
+        |> fmap Text.decodeUtf8
+        |> fmap renderMarkdown
+        |> fmap Text.encodeUtf8
 
 
 renderMarkdown :: Text -> Text
-renderMarkdown text = text
+renderMarkdown text =
+    text

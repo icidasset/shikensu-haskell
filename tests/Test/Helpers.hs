@@ -1,12 +1,12 @@
 module Test.Helpers
-  ( (<&>)
-  , rmap
-  , assertEq
-  , ioErrorHandler
-  , rootPath
-  , sort
-  , testsPath
-  ) where
+    ( (<&>)
+    , rmap
+    , assertEq
+    , ioErrorHandler
+    , rootPath
+    , sort
+    , testsPath
+    ) where
 
 import Shikensu.Sorting (sortByAbsolutePath)
 import Shikensu.Types (Dictionary)
@@ -18,28 +18,35 @@ import qualified Data.List as List
 
 
 (<&>) :: Functor f => f a -> (a -> b) -> f b
-(<&>) = flip fmap
+(<&>) =
+    flip fmap
 
 
 rmap :: Functor f => f a -> (a -> b) -> f b
-rmap = (<&>)
+rmap =
+    (<&>)
 
 
 assertEq :: (Eq a, Show a) => a -> a -> Assertion
-assertEq = assertEqual ""
+assertEq =
+    assertEqual ""
 
 
 ioErrorHandler :: IOError -> IO ()
-ioErrorHandler _ = putStrLn ""
+ioErrorHandler _ =
+    putStrLn ""
 
 
 rootPath :: IO FilePath
-rootPath = canonicalizePath "./"
+rootPath =
+    canonicalizePath "./"
 
 
 sort :: Dictionary -> Dictionary
-sort = List.sortBy sortByAbsolutePath
+sort =
+    List.sortBy sortByAbsolutePath
 
 
 testsPath :: IO FilePath
-testsPath = fmap ((flip combine) "tests") rootPath
+testsPath =
+    fmap ((flip combine) "tests") rootPath

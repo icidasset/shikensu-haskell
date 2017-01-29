@@ -20,28 +20,28 @@ import Shikensu.Contrib.IO (read, write)
 
 dictionary_io :: IO Dictionary
 dictionary_io =
-  Shikensu.list ["src/**/*.md"] absolute_path_to_cwd
-    >>= read
-    >>= flow
-    >>= write "./build"
+    Shikensu.list absolute_path_to_cwd ["src/**/*.md"]
+        >>= read
+        >>= flow
+        >>= write "./build"
 
 
 flow :: Dictionary -> IO Dictionary
 flow =
-     renameExt ".md" ".html"
-  .> permalink "index"
-  .> clone "index.html" "200.html"
-  .> copyPropsToMetadata
-  .> renderContent markdownRenderer
-  .> return
+       renameExt ".md" ".html"
+    .> permalink "index"
+    .> clone "index.html" "200.html"
+    .> copyPropsToMetadata
+    .> renderContent markdownRenderer
+    .> return
 
 
 markdownRenderer :: Definition -> Maybe ByteString
 markdownRenderer def =
-  content def
-    |> fmap Text.decodeUtf8
-    |> fmap Markdown.render
-    |> fmap Text.encodeUtf8
+    content def
+        |> fmap Text.decodeUtf8
+        |> fmap Markdown.render
+        |> fmap Text.encodeUtf8
 ```
 
 

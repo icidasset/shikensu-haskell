@@ -2,8 +2,8 @@
 
 -}
 module Shikensu.Sorting
-  ( sortByAbsolutePath
-  ) where
+    ( sortByAbsolutePath
+    ) where
 
 import Shikensu.Types (Definition, absolutePath)
 
@@ -15,4 +15,4 @@ import Shikensu.Types (Definition, absolutePath)
 -}
 sortByAbsolutePath :: Definition -> Definition -> Ordering
 sortByAbsolutePath defA defB =
-  compare (absolutePath defA) (absolutePath defB)
+    compare (absolutePath defA) (absolutePath defB)

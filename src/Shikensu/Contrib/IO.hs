@@ -2,11 +2,11 @@
 
 -}
 module Shikensu.Contrib.IO
-  ( Shikensu.Contrib.IO.read
-  , Shikensu.Contrib.IO.readDef
-  , Shikensu.Contrib.IO.write
-  , Shikensu.Contrib.IO.writeDef
-  ) where
+    ( Shikensu.Contrib.IO.read
+    , Shikensu.Contrib.IO.readDef
+    , Shikensu.Contrib.IO.write
+    , Shikensu.Contrib.IO.writeDef
+    ) where
 
 import Data.Maybe (fromMaybe)
 import Flow
@@ -24,22 +24,23 @@ Read the contents of each file, and for each file (ie. definition)
 put that content in the `content` property.
 -}
 read :: Dictionary -> IO Dictionary
-read = Utilities.mapIO (readDef)
+read =
+    Utilities.mapIO (readDef)
 
 
 readDef :: Definition -> IO Definition
 readDef def =
-  let
-    absPath = absolutePath def
-  in
-    doesFileExist absPath >>= \exists ->
-      if exists then
-        fmap
-          (\c -> def { content = Just c })
-          (B.readFile absPath)
-      else
-        return
-          def { content = Nothing }
+    let
+        absPath = absolutePath def
+    in
+        doesFileExist absPath >>= \exists ->
+            if exists then
+                fmap
+                    (\c -> def { content = Just c })
+                    (B.readFile absPath)
+            else
+                return
+                    def { content = Nothing }
 
 
 
@@ -49,15 +50,16 @@ Write the contents of each definition to a file.
 The path of the new file is `joinPath [rootDirname, givenDirectoryName, localPath]`.
 -}
 write :: FilePath -> Dictionary -> IO Dictionary
-write dest = Utilities.mapIO (writeDef dest)
+write dest =
+    Utilities.mapIO (writeDef dest)
 
 
 writeDef :: FilePath -> Definition -> IO Definition
 writeDef dest def =
-  let
-    path = joinPath [rootDirname def, dest, localPath def]
-    cont = fromMaybe B.empty (content def)
-  in
-    createDirectoryIfMissing True (takeDirectory path)
-      >> B.writeFile path cont
-      >> return def
+    let
+        path = joinPath [rootDirname def, dest, localPath def]
+        cont = fromMaybe B.empty (content def)
+    in
+        createDirectoryIfMissing True (takeDirectory path)
+            >> B.writeFile path cont
+            >> return def
