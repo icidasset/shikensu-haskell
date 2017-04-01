@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.3.1
+
+- Adjust `base` version range to fix cabal compile failures on older versions of GHC (pre 7.10).
+
 ### v0.3.0
 
 - Added `listRelative` and it's flipped relative.
