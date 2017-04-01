@@ -20,7 +20,7 @@ import Shikensu.Contrib.IO (read, write)
 
 dictionary_io :: IO Dictionary
 dictionary_io =
-    Shikensu.list ["src/**/*.md"] absolute_path_to_cwd
+    Shikensu.listRelative ["src/**/*.md"] "./"
         >>= read
         >>= flow
         >>= write "./build"
