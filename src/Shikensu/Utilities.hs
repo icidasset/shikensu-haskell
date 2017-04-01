@@ -39,8 +39,8 @@ mapIO =
 {-| One way to deal with multiple dictionaries.
 
 > lsequence
->     [ ( "pages", Shikensu.list rootDir ["src/pages/**/*.html"]    )
->     , ( "js",    Shikensu.list rootDir ["src/javascript/**/*.js"] )
+>     [ ( "pages", Shikensu.list ["src/pages/**/*.html"] rootDir    )
+>     , ( "js",    Shikensu.list ["src/javascript/**/*.js"] rootDir )
 >     ]
 
 From multiple IO monads to a single IO monad.

@@ -6,6 +6,8 @@ See the README and tests for examples.
 module Shikensu
     ( list
     , listF
+    , listRelative
+    , listRelativeF
 
     , forkDefinition
     , makeDefinition
@@ -19,6 +21,7 @@ import System.FilePath
 
 import qualified Data.HashMap.Strict as HashMap (empty)
 import qualified Data.List as List (concat, map, zip)
+import qualified System.Directory as Dir (canonicalizePath)
 
 
 
@@ -48,8 +51,22 @@ list patterns rootDir =
 {-| Flipped version of `list`.
 -}
 listF :: FilePath -> [Pattern] -> IO Dictionary
-listF rootDir patterns =
-    list patterns rootDir
+listF = flip list
+
+
+{-| Same as `list`, but given a relative directory.
+
+> listRelative ["*.md"] ./articles
+-}
+listRelative :: [Pattern] -> FilePath -> IO Dictionary
+listRelative patterns relativePath =
+    Dir.canonicalizePath relativePath >>= list patterns
+
+
+{-| Flipped version `listRelative`.
+-}
+listRelativeF :: FilePath -> [Pattern] -> IO Dictionary
+listRelativeF = flip listRelative
 
 
 

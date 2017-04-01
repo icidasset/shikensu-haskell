@@ -12,7 +12,7 @@ import qualified Shikensu.Types as Shikensu
 shikensuTests :: TestTree
 shikensuTests = testGroup
     "Shikensu tests"
-    [testRegular, testDot, testWithoutWd, testRootFile]
+    [testRegular, testDot, testWithoutWd, testRootFile, testRelative]
 
 
 
@@ -137,4 +137,21 @@ testRootFile =
             , testCase "Should have the correct workingDirname"
             $ definition `rmap` Shikensu.workingDirname >>= assertEq ""
 
+            ]
+
+
+testRelative :: TestTree
+testRelative =
+    let
+        pattern = "*.md"
+        dictionary = fmap sort $ Shikensu.listRelative [pattern] "./"
+        definition = fmap List.head dictionary
+        localPath = "CHANGELOG.md"
+    in
+        testGroup "Test relative"
+            [ testCase "Should have the correct rootDirname"
+            $ definition `rmap` Shikensu.rootDirname >>= (\x -> rootPath >>= assertEq x)
+
+            , testCase "Should have the correct localPath"
+            $ definition `rmap` Shikensu.localPath >>= assertEq localPath
             ]
