@@ -56,7 +56,7 @@ listF = flip list
 
 {-| Same as `list`, but given a relative directory.
 
-> listRelative ["*.md"] ./articles
+> listRelative ["*.md"] "./articles"
 -}
 listRelative :: [Pattern] -> FilePath -> IO Dictionary
 listRelative patterns relativePath =
