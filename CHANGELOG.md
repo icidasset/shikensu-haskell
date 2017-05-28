@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.3.3
+
+- Rename `(⚡)` and `(⚡⚡)` to `(~>)` and `(!~>)` respectively
+
 ### v0.3.2
 
 - Fix code in comment 🤦‍♂️

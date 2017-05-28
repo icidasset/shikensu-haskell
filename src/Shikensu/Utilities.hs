@@ -3,8 +3,8 @@ module Shikensu.Utilities
     , mapIO
     , lsequence
 
-    , (⚡)
-    , (⚡⚡)
+    , (~>)
+    , (!~>)
     ) where
 
 import Data.Aeson (FromJSON, ToJSON, fromJSON)
@@ -67,10 +67,10 @@ lsequence list =
 
 
 {-| Get stuff out of the metadata.
-    Return a `Maybe`.
+    Returns a `Maybe`.
 -}
-(⚡) :: (FromJSON a, ToJSON a) => Metadata -> Text -> Maybe a
-(⚡) obj key =
+(~>) :: (FromJSON a, ToJSON a) => Metadata -> Text -> Maybe a
+(~>) obj key =
     HashMap.lookup key obj
         |> fmap fromJSON
         |> fmap fromJSONResult
@@ -79,13 +79,13 @@ lsequence list =
 {-| Get stuff out of the metadata.
     Does NOT return a `Maybe`, but gives an error if it isn't found.
 -}
-(⚡⚡) :: (FromJSON a, ToJSON a) => Metadata -> Text -> a
-(⚡⚡) obj key =
-    case (obj ⚡ key) of
+(!~>) :: (FromJSON a, ToJSON a) => Metadata -> Text -> a
+(!~>) obj key =
+    case (obj ~> key) of
         Just x  -> x
         Nothing -> error <|
             "Could not find the key `" ++ (Text.unpack key)         ++ "` " ++
-            "on the metadata object `" ++ (aesonObjectToString obj) ++ "` using (⚡⚡)"
+            "on the metadata object `" ++ (aesonObjectToString obj) ++ "` using (!~>)"
 
 
 

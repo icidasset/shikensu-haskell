@@ -54,13 +54,13 @@ testThunder =
             fmap List.head dictionary
 
         resultExisting =
-            fmap (\d -> metadata d ⚡ "a" :: Maybe String) def
+            fmap (\d -> metadata d ~> "a" :: Maybe String) def
 
         resultNonExisting =
-            fmap (\d -> metadata d ⚡ "b" :: Maybe String) def
+            fmap (\d -> metadata d ~> "b" :: Maybe String) def
     in
         testGroup
-            "Test (⚡)"
+            "Test (~>)"
             [ testCase "Existing"
             $ resultExisting >>= assertEq (Just "Hi!")
 
