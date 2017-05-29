@@ -25,7 +25,7 @@ module Shikensu.Contrib
     ) where
 
 import Data.ByteString (ByteString)
-import Flow
+import Data.Monoid ((<>))
 import Shikensu (forkDefinition)
 import Shikensu.Internal.Utilities (cleanPath, compileParentPath, compilePathToRoot)
 import Shikensu.Metadata (transposeToMetadata)
@@ -41,7 +41,7 @@ Replace the current hash map with an empty one.
 -}
 clearMetadata :: Dictionary -> Dictionary
 clearMetadata =
-    fmap (clearMetadataDef)
+    fmap clearMetadataDef
 
 
 clearMetadataDef :: Definition -> Definition
@@ -61,12 +61,12 @@ and add that into dictionary just after the matching definition.
 clone :: FilePath -> FilePath -> Dictionary -> Dictionary
 clone existingPath newPath dict =
     let
-        makeNew = \def acc ->
-            if (localPath def) == existingPath
-                then acc ++ [forkDefinition newPath def]
-                else acc
+        makeNew def acc =
+            if localPath def == existingPath
+               then acc <> [forkDefinition newPath def]
+               else acc
     in
-        dict ++ (foldr makeNew [] dict)
+        dict <> foldr makeNew [] dict
 
 
 
@@ -77,7 +77,7 @@ to see what properties get put in here.
 -}
 copyPropsToMetadata :: Dictionary -> Dictionary
 copyPropsToMetadata =
-    fmap (copyPropsToMetadataDef)
+    fmap copyPropsToMetadataDef
 
 
 copyPropsToMetadataDef :: Definition -> Definition
@@ -93,7 +93,7 @@ Filter out the definitions that have the given `localPath`.
 -}
 exclude :: FilePath -> Dictionary -> Dictionary
 exclude path =
-    filter (\def -> (localPath def) /= path)
+    filter (\def -> localPath def /= path)
 
 
 
@@ -127,16 +127,16 @@ permalink a =
 
 permalinkDef :: String -> Definition -> Definition
 permalinkDef newBasename def =
-    if (basename def) /= newBasename then
-        let
-            newDirname = cleanPath $ combine (dirname def) (basename def)
-        in
-            def
-                { basename    = newBasename
-                , dirname     = newDirname
-                , parentPath  = compileParentPath $ newDirname
-                , pathToRoot  = compilePathToRoot $ newDirname
-                }
+    if basename def /= newBasename then
+       let
+           newDirname = cleanPath $ combine (dirname def) (basename def)
+       in
+           def
+               { basename    = newBasename
+               , dirname     = newDirname
+               , parentPath  = compileParentPath newDirname
+               , pathToRoot  = compilePathToRoot newDirname
+               }
     else
         def
 
@@ -153,12 +153,12 @@ prefixDirname prefix = fmap (prefixDirnameDef prefix)
 prefixDirnameDef :: String -> Definition -> Definition
 prefixDirnameDef prefix def =
     let
-        newDirname = prefix ++ (dirname def)
+        newDirname = prefix <> dirname def
     in
         def
             { dirname     = newDirname
-            , parentPath  = compileParentPath $ newDirname
-            , pathToRoot  = compilePathToRoot $ newDirname
+            , parentPath  = compileParentPath newDirname
+            , pathToRoot  = compilePathToRoot newDirname
             }
 
 
@@ -178,9 +178,9 @@ rename a b = fmap (renameDef a b)
 
 renameDef :: FilePath -> FilePath -> Definition -> Definition
 renameDef oldPath newPath def =
-  if (localPath def) == oldPath
-    then forkDefinition newPath def
-    else def
+  if localPath def == oldPath
+     then forkDefinition newPath def
+     else def
 
 
 
@@ -199,7 +199,7 @@ renameExt a b =
 
 renameExtDef :: String -> String -> Definition -> Definition
 renameExtDef oldExtname newExtname def =
-    if (extname def) == oldExtname
+    if extname def == oldExtname
         then def { extname = newExtname }
         else def
 

@@ -8,6 +8,8 @@ module Shikensu.Utilities
     ) where
 
 import Data.Aeson (FromJSON, ToJSON, fromJSON)
+import Data.Maybe (fromMaybe)
+import Data.Monoid ((<>))
 import Data.Text (Text)
 import Flow
 import Shikensu.Types
@@ -15,8 +17,7 @@ import Shikensu.Types
 import qualified Data.Aeson as Json (Object, Result(..), encode)
 import qualified Data.HashMap.Strict as HashMap (lookup)
 import qualified Data.List as List (unzip, zip)
-import qualified Data.Tuple as Tuple (fst, snd)
-import qualified Data.Text as Text (concat, unpack)
+import qualified Data.Text as Text (unpack)
 import qualified Data.Text.Lazy as Lazy.Text (unpack)
 import qualified Data.Text.Lazy.Encoding as Lazy.Text (decodeUtf8)
 
@@ -52,10 +53,10 @@ lsequence list =
             List.unzip list
 
         identifiers =
-            Tuple.fst unzippedList
+            fst unzippedList
 
         dictionaries =
-            Tuple.snd unzippedList
+            snd unzippedList
     in
         dictionaries
             |> sequence
@@ -81,11 +82,12 @@ lsequence list =
 -}
 (!~>) :: (FromJSON a, ToJSON a) => Metadata -> Text -> a
 (!~>) obj key =
-    case (obj ~> key) of
-        Just x  -> x
-        Nothing -> error <|
-            "Could not find the key `" ++ (Text.unpack key)         ++ "` " ++
-            "on the metadata object `" ++ (aesonObjectToString obj) ++ "` using (!~>)"
+  fromMaybe errorMessage (obj ~> key)
+  where
+    errorMessage =
+      error <|
+      "Could not find the key `" <> Text.unpack key         <> "` " <>
+      "on the metadata object `" <> aesonObjectToString obj <> "` using (!~>)"
 
 
 
