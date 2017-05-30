@@ -3,7 +3,12 @@
 > シーケンス    
 > Sequence
 
-A small toolset for building static websites.
+Run a sequence of functions on in-memory representations of files.  
+__Build static websites with ease__, without conforming to a specific structure.
+
+
+
+### Markdown example
 
 
 ```haskell
@@ -43,6 +48,18 @@ markdownRenderer def =
         |> fmap Markdown.render
         |> fmap Text.encodeUtf8
 ```
+
+This lists all the markdown files in the `./src` directory  
+and then does the following in this exact order:
+
+1. Change the extension of each matched file to `.html`.
+2. Change the path of each matched file to `%matched_path/%file_basename/index.%file_extension`.
+3. Make an in-memory copy of the file that has the `index.html` path.
+4. Copy the information of each definition (aka. file) to its metadata "object"
+   (so we can use that information in our content renderer).
+5. Map the `content` property of each definition
+   (in this case we are rendering markdown).
+6. __{post-flow}__ Write to the `./build` directory.
 
 
 
