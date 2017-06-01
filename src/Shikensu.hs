@@ -13,7 +13,6 @@ module Shikensu
     , makeDictionary
     ) where
 
-import Data.Monoid ((<>))
 import Flow
 import Shikensu.Internal.Utilities
 import Shikensu.Types
@@ -38,6 +37,99 @@ import qualified System.FilePath.Glob as Glob (compile, globDir1)
 5. Merge the dictionaries into one dictionary.
 
 > list ["*.md"] "/root/articles"
+
+
+## Tests
+
+$setup
+>>> import qualified Test.Utils
+
+Standard usage.
+
+>>> Test.Utils.printDF $ listRelative ["tests/**/*.md"] "."
+Definition
+  { basename = "example"
+  , dirname = "fixtures"
+  , extname = ".md"
+  , pattern = "tests/**/*.md"
+  , rootDirname = ...
+  , workingDirname = "tests"
+  , content = ...
+  , metadata = ...
+  , parentPath = Just "../"
+  , pathToRoot = "../"
+  }
+
+Pattern with a leading dot-slash.
+
+>>> Test.Utils.printDF $ listRelative ["./tests/**/*.md"] "."
+Definition
+  { basename = "example"
+  , dirname = "fixtures"
+  , extname = ".md"
+  , pattern = "./tests/**/*.md"
+  , rootDirname = ...
+  , workingDirname = "tests"
+  , content = ...
+  , metadata = ...
+  , parentPath = Just "../"
+  , pathToRoot = "../"
+  }
+
+Pattern without a "common directory" (workingdirname).
+
+>>> Test.Utils.printDF $ listRelative ["**/*.md"] "./tests"
+Definition
+  { basename = "example"
+  , dirname = "fixtures"
+  , extname = ".md"
+  , pattern = "**/*.md"
+  , rootDirname = ...
+  , workingDirname = ""
+  , content = ...
+  , metadata = ...
+  , parentPath = Just "../"
+  , pathToRoot = "../"
+  }
+
+Test file in the root directory.
+
+>>> Test.Utils.printDF $ listRelative ["*.md"] "./"
+Definition
+  { basename = "CHANGELOG"
+  , dirname = ""
+  , extname = ".md"
+  , pattern = "*.md"
+  , rootDirname = ...
+  , workingDirname = ""
+  , content = ...
+  , metadata = ...
+  , parentPath = Nothing
+  , pathToRoot = ""
+  }
+
+Test `list` with a root dir that has a trailing slash.
+
+>>> import Data.Monoid ((<>))
+>>> import System.Directory (canonicalizePath)
+>>> :{
+        fmap (<> "/") (canonicalizePath ".")
+            >>= list ["./*.md"]
+            |> Test.Utils.printDF
+    :}
+Definition
+  { basename = "CHANGELOG"
+  , dirname = ""
+  , extname = ".md"
+  , pattern = "./*.md"
+  , rootDirname = ...
+  , workingDirname = ""
+  , content = ...
+  , metadata = ...
+  , parentPath = Nothing
+  , pathToRoot = ""
+  }
+
 -}
 list :: [String] -> FilePath -> IO Dictionary
 list patterns rootDir =
@@ -58,6 +150,7 @@ listF = flip list
 {-| Same as `list`, but given a relative directory.
 
 > listRelative ["*.md"] "./articles"
+
 -}
 listRelative :: [String] -> FilePath -> IO Dictionary
 listRelative patterns relativePath =
@@ -75,6 +168,27 @@ listRelativeF = flip listRelative
 
 
 {-| Fork a Definition.
+
+>>> import qualified Test.Utils
+>>> :{
+        "/root/src/Example.hs"
+            |> makeDefinition "/root" "*.*"
+            |> forkDefinition "new_path/Sample.hs"
+            |> Test.Utils.print
+    :}
+Definition
+  { basename = "Sample"
+  , dirname = "new_path"
+  , extname = ".hs"
+  , pattern = "*.*"
+  , rootDirname = "/root"
+  , workingDirname = ""
+  , content = Nothing
+  , metadata = fromList []
+  , parentPath = Just "../"
+  , pathToRoot = "../"
+  }
+
 -}
 forkDefinition :: FilePath -> Definition -> Definition
 forkDefinition newLocalPath def =
@@ -97,25 +211,24 @@ forkDefinition newLocalPath def =
 
 {-| Make a Definition.
 
-Example definition, given:
-
-- the root path `/Users/icidasset/Projects/shikensu`
-- the pattern `example/**/*.md`
-- the absolute path `/Users/icidasset/Projects/shikensu/example/test/hello.md`
-
-> Definition
->     { basename = "hello"
->     , dirname = "test"
->     , extname = ".md"
->     , pattern = "example/**/*.md"
->     , rootDirname = "/Users/icidasset/Projects/shikensu"
->     , workingDirname = "example"
->
->     , content = Nothing
->     , metadata = HashMap.empty
->     , parentPath = "../"
->     , pathToRoot = "../../"
->     }
+>>> import qualified Test.Utils
+>>> :{
+        "/root/src/Shikensu/Contrib.hs"
+            |> makeDefinition "/root" "src/**/*.hs"
+            |> Test.Utils.print
+    :}
+Definition
+  { basename = "Contrib"
+  , dirname = "Shikensu"
+  , extname = ".hs"
+  , pattern = "src/**/*.hs"
+  , rootDirname = "/root"
+  , workingDirname = "src"
+  , content = Nothing
+  , metadata = fromList []
+  , parentPath = Just "../"
+  , pathToRoot = "../"
+  }
 
 -}
 makeDefinition :: FilePath -> String -> FilePath -> Definition

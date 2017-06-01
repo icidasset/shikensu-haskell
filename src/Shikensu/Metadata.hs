@@ -13,7 +13,6 @@ import qualified Data.Aeson as Aeson (FromJSON, Result(..), ToJSON, fromJSON, to
 import qualified Data.HashMap.Strict as HashMap (empty)
 
 
-
 {-| Transpose metadata.
 
 Transpose our metadata object to a given type
