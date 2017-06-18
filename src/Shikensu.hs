@@ -11,12 +11,13 @@ module Shikensu
     , listRelativeF
     , makeDefinition
     , makeDictionary
+    , module Shikensu.Internal.Types
     ) where
 
 import Data.Monoid ((<>))
 import Flow
+import Shikensu.Internal.Types
 import Shikensu.Internal.Utilities
-import Shikensu.Types
 import System.FilePath
 
 import qualified Data.HashMap.Strict as HashMap (empty)
@@ -38,6 +39,7 @@ import qualified System.FilePath.Glob as Glob (compile, globDir1)
 5. Merge the dictionaries into one dictionary.
 
 > list ["*.md"] "/root/articles"
+
 -}
 list :: [String] -> FilePath -> IO Dictionary
 list patterns rootDir =
@@ -58,6 +60,7 @@ listF = flip list
 {-| Same as `list`, but given a relative directory.
 
 > listRelative ["*.md"] "./articles"
+
 -}
 listRelative :: [String] -> FilePath -> IO Dictionary
 listRelative patterns relativePath =

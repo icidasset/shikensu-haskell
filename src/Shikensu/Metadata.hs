@@ -7,11 +7,10 @@ module Shikensu.Metadata
     ) where
 
 import Flow
-import Shikensu.Types
+import Shikensu.Internal.Types
 
 import qualified Data.Aeson as Aeson (FromJSON, Result(..), ToJSON, fromJSON, toJSON)
 import qualified Data.HashMap.Strict as HashMap (empty)
-
 
 
 {-| Transpose metadata.

@@ -27,9 +27,9 @@ module Shikensu.Contrib
 import Data.ByteString (ByteString)
 import Data.Monoid ((<>))
 import Shikensu (forkDefinition)
+import Shikensu.Internal.Types
 import Shikensu.Internal.Utilities (compileParentPath, compilePathToRoot)
 import Shikensu.Metadata (transposeToMetadata)
-import Shikensu.Types
 import System.FilePath (FilePath, combine)
 
 import qualified Data.HashMap.Strict as HashMap (empty, union)

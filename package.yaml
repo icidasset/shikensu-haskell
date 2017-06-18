@@ -1,7 +1,7 @@
 name: shikensu
-version: 0.4.0
+version: 0.3.4
 maintainer: Steven Vandevelde <icid.asset@gmail.com>
-category: File IO
+category: Filesystem
 
 
 synopsis: Run a sequence of functions on in-memory representations of files
@@ -25,7 +25,7 @@ dependencies:
   - flow == 1.0.*
   - Glob == 0.7.*
   - unordered-containers == 0.2.*
-  - text >= 1.2 && < 2
+  - text == 1.2.*
 
 
 tests:

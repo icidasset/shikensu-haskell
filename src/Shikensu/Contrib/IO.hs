@@ -9,7 +9,7 @@ module Shikensu.Contrib.IO
     ) where
 
 import Data.Maybe (fromMaybe)
-import Shikensu.Types
+import Shikensu.Internal.Types
 import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath (FilePath, joinPath, takeDirectory)
 
