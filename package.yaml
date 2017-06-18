@@ -1,0 +1,39 @@
+name: shikensu
+version: 0.4.0
+maintainer: Steven Vandevelde <icid.asset@gmail.com>
+category: File IO
+
+
+synopsis: Run a sequence of functions on in-memory representations of files
+description: See README at <https://github.com/icidasset/shikensu#readme>
+license: MIT
+github: icidasset/shikensu
+
+
+default-extensions:
+   DisambiguateRecordFields
+   DuplicateRecordFields
+   OverloadedStrings
+
+
+dependencies:
+  - aeson == 1.0.*
+  - base >= 4.9 && < 5
+  - bytestring == 0.10.*
+  - directory == 1.3.*
+  - filepath == 1.4.*
+  - flow == 1.0.*
+  - Glob == 0.7.*
+  - unordered-containers == 0.2.*
+  - text >= 1.2 && < 2
+
+
+tests:
+  spec:
+    main: Test.hs
+    source-dirs:
+      - tests
+      - src
+    dependencies:
+      - tasty == 0.11.*
+      - tasty-hunit == 0.9.*
