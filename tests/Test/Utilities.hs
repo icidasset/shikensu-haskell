@@ -1,4 +1,6 @@
-module Test.Utilities (utilityTests) where
+module Test.Utilities
+    ( utilityTests
+    ) where
 
 import Flow
 import Shikensu.Types
@@ -9,6 +11,7 @@ import Test.Tasty.HUnit
 
 import qualified Data.HashMap.Strict as HashMap (singleton)
 import qualified Data.List as List (head)
+import qualified Data.Tuple as Tuple (fst)
 import qualified Shikensu
 import qualified Shikensu.Contrib as Contrib
 
@@ -17,7 +20,6 @@ utilityTests :: TestTree
 utilityTests = testGroup
     "Utility tests"
     [testSequencing, testThunder]
-
 
 
 
@@ -34,7 +36,7 @@ testSequencing =
                 ]
     in
         testCase "Test lsequence"
-        $ (List.head .> fst) <$> result >>= assertEq "a"
+        $ (List.head .> Tuple.fst) <$> result >>= assertEq "a"
 
 
 testThunder :: TestTree

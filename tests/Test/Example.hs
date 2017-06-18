@@ -1,7 +1,15 @@
-module Test.Example (exampleTests) where
+module Test.Example
+    ( exampleTests
+    ) where
 
+import Data.ByteString (ByteString)
+import Data.Monoid ((<>))
 import Data.Text (Text)
-import System.Directory (canonicalizePath)
+import Flow
+import Prelude hiding (read)
+import Shikensu.Contrib
+import Shikensu.Contrib.IO (read, write)
+import Shikensu.Types
 import Test.Helpers
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -9,25 +17,24 @@ import Test.Tasty.HUnit
 import qualified Data.Text.Encoding as Text (decodeUtf8, encodeUtf8)
 import qualified Shikensu
 
-import Data.ByteString (ByteString)
-import Flow
-import Prelude hiding (read)
-import Shikensu.Types
-import Shikensu.Contrib
-import Shikensu.Contrib.IO (read, write)
-
 
 exampleTests :: TestTree
 exampleTests =
-    let
-        path = canonicalizePath "./tests"
-        dict = path >>= dictionary_io
-        test = path >>= \p ->
-            read [Shikensu.makeDefinition p "fixtures/*.md" "fixtures/example.md"]
-            >>= flow
-    in
-        testCase "Example test"
-        $ dict >>= \d -> test >>= assertEq d
+    testCase "Example test" $ dictionaries >>= uncurry assertEq
+
+
+dictionaries :: IO (Dictionary, Dictionary)
+dictionaries = do
+    root            <- testsPath
+    dictA           <- dictionary_io root
+
+    let absolute    = root <> "/fixtures/example.md"
+    let dictB       = [Shikensu.makeDefinition root "fixtures/*.md" absolute]
+
+    dictB_Read      <- read dictB
+    dictB_Final     <- flow dictB_Read
+
+    return (dictA, dictB_Final)
 
 
 

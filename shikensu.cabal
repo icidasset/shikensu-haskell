@@ -1,5 +1,5 @@
 name: shikensu
-version: 0.3.3
+version: 0.4.0
 category: File IO
 
 synopsis:
@@ -31,6 +31,8 @@ library
     Haskell2010
 
   default-extensions:
+    DisambiguateRecordFields
+    DuplicateRecordFields
     OverloadedStrings
 
   hs-source-dirs:
@@ -48,7 +50,7 @@ library
 
   build-depends:
     aeson == 1.0.*,
-    base >= 4.8 && < 5,
+    base >= 4.9 && < 5,
     bytestring == 0.10.*,
     directory == 1.3.*,
     filepath == 1.4.*,

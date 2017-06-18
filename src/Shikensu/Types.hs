@@ -1,14 +1,14 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-
 {-| Types and path helpers.
 
 -}
 module Shikensu.Types where
 
-import Data.Aeson (ToJSON, Object, (.=), object, toJSON)
+import Data.Aeson ((.=), toJSON)
 import Data.ByteString (ByteString)
 import Data.Monoid ((<>))
 import System.FilePath (joinPath)
+
+import qualified Data.Aeson as Aeson (Object, ToJSON, object)
 
 
 {-| A file definition, along with some additional properties.
@@ -18,7 +18,7 @@ data Definition =
         { basename :: String
         , dirname :: FilePath
         , extname :: String
-        , pattern :: Pattern
+        , pattern :: String
         , rootDirname :: FilePath
         , workingDirname :: FilePath
 
@@ -30,9 +30,9 @@ data Definition =
         } deriving (Eq, Show)
 
 
-instance ToJSON Definition where
+instance Aeson.ToJSON Definition where
     toJSON def =
-        object
+        Aeson.object
             [ "basename"        .= basename def
             , "dirname"         .= dirname def
             , "extname"         .= extname def
@@ -44,14 +44,11 @@ instance ToJSON Definition where
 
 
 
-
 -- Type aliases
 
 
 type Dictionary = [Definition]
-type Metadata = Object
-type Pattern = String
-
+type Metadata = Aeson.Object
 
 
 

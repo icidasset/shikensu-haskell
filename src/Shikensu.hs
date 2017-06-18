@@ -4,25 +4,25 @@ See the README and tests for examples.
 
 -}
 module Shikensu
-    ( list
+    ( forkDefinition
+    , list
     , listF
     , listRelative
     , listRelativeF
-
-    , forkDefinition
     , makeDefinition
     , makeDictionary
     ) where
 
+import Data.Monoid ((<>))
 import Flow
 import Shikensu.Internal.Utilities
 import Shikensu.Types
 import System.FilePath
 
 import qualified Data.HashMap.Strict as HashMap (empty)
-import qualified Data.List as List (concat, map, zip)
+import qualified Data.List as List (concatMap, map, zip)
 import qualified System.Directory as Dir (canonicalizePath)
-
+import qualified System.FilePath.Glob as Glob (compile, globDir1)
 
 
 -- IO
@@ -37,20 +37,21 @@ import qualified System.Directory as Dir (canonicalizePath)
 4. We make a Dictionary out of each tuple (this also needs the path).
 5. Merge the dictionaries into one dictionary.
 
+> list ["*.md"] "/root/articles"
 -}
-list :: [Pattern] -> FilePath -> IO Dictionary
+list :: [String] -> FilePath -> IO Dictionary
 list patterns rootDir =
     patterns
-        |> compilePatterns
-        |> globDir rootDir
+        |> List.map (Glob.compile)
+        |> List.map (flip Glob.globDir1 $ rootDir)
+        |> sequence
         |> fmap (List.zip patterns)
-        |> fmap (List.map (uncurry . makeDictionary $ rootDir))
-        |> fmap (List.concat)
+        |> fmap (List.concatMap $ makeDictionary rootDir)
 
 
 {-| Flipped version of `list`.
 -}
-listF :: FilePath -> [Pattern] -> IO Dictionary
+listF :: FilePath -> [String] -> IO Dictionary
 listF = flip list
 
 
@@ -58,16 +59,15 @@ listF = flip list
 
 > listRelative ["*.md"] "./articles"
 -}
-listRelative :: [Pattern] -> FilePath -> IO Dictionary
+listRelative :: [String] -> FilePath -> IO Dictionary
 listRelative patterns relativePath =
     Dir.canonicalizePath relativePath >>= list patterns
 
 
 {-| Flipped version `listRelative`.
 -}
-listRelativeF :: FilePath -> [Pattern] -> IO Dictionary
+listRelativeF :: FilePath -> [String] -> IO Dictionary
 listRelativeF = flip listRelative
-
 
 
 
@@ -101,7 +101,7 @@ Example definition, given:
 
 - the root path `/Users/icidasset/Projects/shikensu`
 - the pattern `example/**/*.md`
-- the workspace path `example/test/hello.md`
+- the absolute path `/Users/icidasset/Projects/shikensu/example/test/hello.md`
 
 > Definition
 >     { basename = "hello"
@@ -118,31 +118,34 @@ Example definition, given:
 >     }
 
 -}
-makeDefinition :: FilePath -> Pattern -> FilePath -> Definition
-makeDefinition _rootDirname _pattern _workspacePath =
+makeDefinition :: FilePath -> String -> FilePath -> Definition
+makeDefinition rootDirname pattern absolutePath =
     let
-        workingDir  = cleanPath . (commonDirectory) $ _pattern
-        localPath'  = cleanPath . (stripPrefix workingDir) . cleanPath $ _workspacePath
+        workingDirname      = commonDirectory pattern
+        rootWorkingDirname  = combine rootDirname workingDirname
+
+        theAbsolutePath     = normalise absolutePath
+        theLocalPath        = dropDrive (stripPrefix rootWorkingDirname theAbsolutePath)
     in
         Definition
-            { basename        = takeBaseName localPath'
-            , dirname         = takeDirName localPath'
-            , extname         = takeExtension localPath'
-            , pattern         = _pattern
-            , rootDirname     = dropTrailingPathSeparator _rootDirname
-            , workingDirname  = workingDir
+            { basename        = takeBaseName theLocalPath
+            , dirname         = takeDirName theLocalPath
+            , extname         = takeExtension theLocalPath
+            , pattern         = pattern
+            , rootDirname     = rootDirname
+            , workingDirname  = workingDirname
 
             -- Additional properties
             , content         = Nothing
             , metadata        = HashMap.empty
-            , parentPath      = compileParentPath $ takeDirName localPath'
-            , pathToRoot      = compilePathToRoot $ takeDirName localPath'
+            , parentPath      = compileParentPath $ takeDirName theLocalPath
+            , pathToRoot      = compilePathToRoot $ takeDirName theLocalPath
             }
 
 
 
 {-| Make a Dictionary.
 -}
-makeDictionary :: FilePath -> Pattern -> [FilePath] -> Dictionary
-makeDictionary _rootDirname _pattern =
-    List.map (makeDefinition _rootDirname _pattern)
+makeDictionary :: FilePath -> (String, [FilePath]) -> Dictionary
+makeDictionary rootDirname (pattern, filepaths) =
+    List.map (makeDefinition rootDirname pattern) filepaths

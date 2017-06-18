@@ -1,4 +1,6 @@
-module Test.Contrib (contribTests) where
+module Test.Contrib
+    ( contribTests
+    ) where
 
 import Data.ByteString (ByteString)
 import Flow
@@ -13,8 +15,8 @@ import qualified Data.ByteString.Char8 as BS (intercalate, pack)
 import qualified Data.HashMap.Strict as HashMap (fromList, lookup)
 import qualified Data.List as List (head, reverse)
 import qualified Data.Text as Text (pack, unpack)
-import qualified Data.Text.IO as Text (readFile)
 import qualified Data.Text.Encoding as Text (decodeUtf8)
+import qualified Data.Text.IO as Text (readFile)
 import qualified Shikensu
 import qualified Shikensu.Contrib as Contrib
 import qualified Shikensu.Contrib.IO as Contrib.IO
@@ -38,11 +40,10 @@ contribTests = testGroup
 
 
 
-
 -- Test data
 
 
-list :: Shikensu.Pattern -> IO Shikensu.Dictionary
+list :: String -> IO Shikensu.Dictionary
 list pattern =
     rootPath >>= Shikensu.list [pattern]
 
@@ -61,7 +62,6 @@ renderer def =
         def
             |> Shikensu.content
             |> fmap (\c -> BS.intercalate B.empty [openingTag, c, closingTag])
-
 
 
 

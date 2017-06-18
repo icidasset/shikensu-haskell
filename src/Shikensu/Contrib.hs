@@ -27,7 +27,7 @@ module Shikensu.Contrib
 import Data.ByteString (ByteString)
 import Data.Monoid ((<>))
 import Shikensu (forkDefinition)
-import Shikensu.Internal.Utilities (cleanPath, compileParentPath, compilePathToRoot)
+import Shikensu.Internal.Utilities (compileParentPath, compilePathToRoot)
 import Shikensu.Metadata (transposeToMetadata)
 import Shikensu.Types
 import System.FilePath (FilePath, combine)
@@ -61,7 +61,7 @@ and add that into dictionary just after the matching definition.
 clone :: FilePath -> FilePath -> Dictionary -> Dictionary
 clone existingPath newPath dict =
     let
-        makeNew def acc =
+        makeNew = \def acc ->
             if localPath def == existingPath
                then acc <> [forkDefinition newPath def]
                else acc
@@ -129,7 +129,7 @@ permalinkDef :: String -> Definition -> Definition
 permalinkDef newBasename def =
     if basename def /= newBasename then
        let
-           newDirname = cleanPath $ combine (dirname def) (basename def)
+           newDirname = combine (dirname def) (basename def)
        in
            def
                { basename    = newBasename
