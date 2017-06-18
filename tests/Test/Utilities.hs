@@ -9,7 +9,6 @@ import Test.Tasty.HUnit
 
 import qualified Data.HashMap.Strict as HashMap (singleton)
 import qualified Data.List as List (head)
-import qualified Data.Tuple as Tuple (fst)
 import qualified Shikensu
 import qualified Shikensu.Contrib as Contrib
 
@@ -35,7 +34,7 @@ testSequencing =
                 ]
     in
         testCase "Test lsequence"
-        $ (List.head .> Tuple.fst) <$> result >>= assertEq "a"
+        $ (List.head .> fst) <$> result >>= assertEq "a"
 
 
 testThunder :: TestTree
@@ -65,5 +64,5 @@ testThunder =
             $ resultExisting >>= assertEq (Just "Hi!")
 
             , testCase "Non-existing"
-            $ resultNonExisting >>= assertEq (Nothing)
+            $ resultNonExisting >>= assertEq Nothing
             ]

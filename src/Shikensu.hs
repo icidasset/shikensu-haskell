@@ -122,12 +122,12 @@ makeDefinition :: FilePath -> Pattern -> FilePath -> Definition
 makeDefinition _rootDirname _pattern _workspacePath =
     let
         workingDir  = cleanPath . (commonDirectory) $ _pattern
-        localPath   = cleanPath . (stripPrefix workingDir) . cleanPath $ _workspacePath
+        localPath'  = cleanPath . (stripPrefix workingDir) . cleanPath $ _workspacePath
     in
         Definition
-            { basename        = takeBaseName localPath
-            , dirname         = takeDirName localPath
-            , extname         = takeExtension localPath
+            { basename        = takeBaseName localPath'
+            , dirname         = takeDirName localPath'
+            , extname         = takeExtension localPath'
             , pattern         = _pattern
             , rootDirname     = dropTrailingPathSeparator _rootDirname
             , workingDirname  = workingDir
@@ -135,8 +135,8 @@ makeDefinition _rootDirname _pattern _workspacePath =
             -- Additional properties
             , content         = Nothing
             , metadata        = HashMap.empty
-            , parentPath      = compileParentPath $ takeDirName localPath
-            , pathToRoot      = compilePathToRoot $ takeDirName localPath
+            , parentPath      = compileParentPath $ takeDirName localPath'
+            , pathToRoot      = compilePathToRoot $ takeDirName localPath'
             }
 
 

@@ -9,7 +9,6 @@ module Shikensu.Contrib.IO
     ) where
 
 import Data.Maybe (fromMaybe)
-import Flow
 import Shikensu.Types
 import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath (FilePath, joinPath, takeDirectory)
@@ -25,7 +24,7 @@ put that content in the `content` property.
 -}
 read :: Dictionary -> IO Dictionary
 read =
-    Utilities.mapIO (readDef)
+    Utilities.mapIO readDef
 
 
 readDef :: Definition -> IO Definition

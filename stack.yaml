@@ -1,2 +1,5 @@
 resolver: lts-8.6
 packages: ['.']
+nix:
+  enable: false
+  packages: [zlib]

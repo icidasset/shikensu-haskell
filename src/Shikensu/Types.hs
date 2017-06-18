@@ -1,3 +1,5 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 {-| Types and path helpers.
 
 -}
@@ -5,6 +7,7 @@ module Shikensu.Types where
 
 import Data.Aeson (ToJSON, Object, (.=), object, toJSON)
 import Data.ByteString (ByteString)
+import Data.Monoid ((<>))
 import System.FilePath (joinPath)
 
 
@@ -62,7 +65,7 @@ absolutePath def =
 
 localPath :: Definition -> String
 localPath def =
-    joinPath [dirname def, (basename def) ++ (extname def)]
+    joinPath [dirname def, basename def <> extname def]
 
 
 workspacePath :: Definition -> String
