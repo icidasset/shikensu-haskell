@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.3.5
+
+- Fix package.yaml file (nothing was exported)
+
 ### v0.3.4
 
 - Some light refactoring
