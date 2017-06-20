@@ -6,8 +6,8 @@
 Run a sequence of functions on in-memory representations of files.  
 __Build static websites with ease__, without conforming to a specific structure.
 
-![](https://www.stackage.org/package/shikensu/badge/nightly?label=version)
-![](https://travis-ci.org/icidasset/shikensu.svg?branch=master)
+[![](https://www.stackage.org/package/shikensu/badge/nightly?label=version)](https://www.stackage.org/package/shikensu)
+[![](https://travis-ci.org/icidasset/shikensu.svg?branch=master)](https://travis-ci.org/icidasset/shikensu)
 
 
 
