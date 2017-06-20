@@ -12,15 +12,14 @@ __Build static websites with ease__, without conforming to a specific structure.
 
 
 ```haskell
-import qualified Data.Text.Encoding as Text (decodeUtf8, encodeUtf8)
-import qualified Shikensu
+import Shikensu
+import Shikensu.Contrib (clone, copyPropsToMetadata, permalink, renameExt, renderContent)
+import Shikensu.Contrib.IO (read, write)
 
 import Data.ByteString (ByteString)
 import Flow
 import Prelude hiding (read)
-import Shikensu.Types
-import Shikensu.Contrib
-import Shikensu.Contrib.IO (read, write)
+import qualified Data.Text.Encoding as Text (decodeUtf8, encodeUtf8)
 
 
 dictionary_io :: IO Dictionary

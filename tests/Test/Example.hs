@@ -7,8 +7,8 @@ import Data.Monoid ((<>))
 import Data.Text (Text)
 import Flow
 import Prelude hiding (read)
-import Shikensu
-import Shikensu.Contrib
+import Shikensu (Definition(..), Dictionary(..), list, makeDefinition)
+import Shikensu.Contrib (clone, copyPropsToMetadata, permalink, renameExt, renderContent)
 import Shikensu.Contrib.IO (read, write)
 import System.Directory (canonicalizePath)
 import Test.Helpers
