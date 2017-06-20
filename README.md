@@ -75,7 +75,7 @@ Because this allows me to easily define a workflow for building a static website
 ### Usage examples
 
 - [Simple example](https://github.com/icidasset/ongaku-ryoho/blob/47139dd903494beccb9d18bb23261ae85f7d510e/system/Main.hs#L17)
-- [Slightly more complicated example](https://github.com/icidasset/icidasset/blob/4a439b3c4320c9efdf65b6456604462bb39bceaa/system/Main.hs#L36)
+- [Slightly more complicated example](https://github.com/icidasset/icidasset/blob/f6acd52525abe38286aebe915dd4e97a9d3add33/system/Build/Main.hs#L33)
 
 
 
