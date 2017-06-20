@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.3.6
+
+- Use Stackage Nightly
+
 ### v0.3.5
 
 - Fix package.yaml file (nothing was exported)
