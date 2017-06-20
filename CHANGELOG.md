@@ -1,5 +1,10 @@
 # Changelog
 
+### v0.3.4
+
+- Some light refactoring
+- Types are now in an internal module and __re-exported in the main Shikensu module__
+
 ### v0.3.3
 
 - Rename `(⚡)` and `(⚡⚡)` to `(~>)` and `(!~>)` respectively

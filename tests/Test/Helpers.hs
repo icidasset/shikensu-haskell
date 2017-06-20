@@ -1,30 +1,24 @@
 module Test.Helpers
-    ( (<&>)
-    , rmap
+    ( assertDef
     , assertEq
-    , ioErrorHandler
-    , rootPath
-    , sort
-    , testsPath
+    , assertEqm
+    , define
     ) where
 
+import Flow
+import Shikensu
 import Shikensu.Sorting (sortByAbsolutePath)
-import Shikensu.Types (Dictionary)
-import System.Directory (canonicalizePath)
-import System.FilePath (combine)
 import Test.Tasty.HUnit (Assertion, assertEqual)
 
-import qualified Data.List as List
+import qualified Data.List as List (head, sortBy)
 
 
-(<&>) :: Functor f => f a -> (a -> b) -> f b
-(<&>) =
-    flip fmap
+-- Assertions
 
 
-rmap :: Functor f => f a -> (a -> b) -> f b
-rmap =
-    (<&>)
+assertDef :: (Eq a, Show a) => IO Definition -> (Definition -> a) -> a -> Assertion
+assertDef definition recordFn value =
+    fmap recordFn definition >>= assertEq value
 
 
 assertEq :: (Eq a, Show a) => a -> a -> Assertion
@@ -32,21 +26,18 @@ assertEq =
     assertEqual ""
 
 
-ioErrorHandler :: IOError -> IO ()
-ioErrorHandler _ =
-    putStrLn ""
+assertEqm :: (Eq a, Show a) => IO a -> a -> Assertion
+assertEqm a b =
+    a >>= assertEqual "" b
 
 
-rootPath :: IO FilePath
-rootPath =
-    canonicalizePath "./"
+
+-- Shortcuts
 
 
-sort :: Dictionary -> Dictionary
-sort =
-    List.sortBy sortByAbsolutePath
-
-
-testsPath :: IO FilePath
-testsPath =
-    fmap ((flip combine) "tests") rootPath
+define :: String -> String -> IO Definition
+define pattern root =
+    root
+        |> Shikensu.listRelative [pattern]
+        |> fmap (List.sortBy sortByAbsolutePath)
+        |> fmap List.head

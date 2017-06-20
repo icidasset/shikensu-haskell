@@ -1,7 +1,8 @@
 {-| Types and path helpers.
+    This is re-exported in the main `Shikensu` module.
 
 -}
-module Shikensu.Types where
+module Shikensu.Internal.Types where
 
 import Data.Aeson ((.=), toJSON)
 import Data.ByteString (ByteString)

@@ -7,15 +7,15 @@ import Data.Monoid ((<>))
 import Data.Text (Text)
 import Flow
 import Prelude hiding (read)
+import Shikensu
 import Shikensu.Contrib
 import Shikensu.Contrib.IO (read, write)
-import Shikensu.Types
+import System.Directory (canonicalizePath)
 import Test.Helpers
 import Test.Tasty
 import Test.Tasty.HUnit
 
 import qualified Data.Text.Encoding as Text (decodeUtf8, encodeUtf8)
-import qualified Shikensu
 
 
 exampleTests :: TestTree
@@ -25,7 +25,7 @@ exampleTests =
 
 dictionaries :: IO (Dictionary, Dictionary)
 dictionaries = do
-    root            <- testsPath
+    root            <- canonicalizePath "./tests"
     dictA           <- dictionary_io root
 
     let absolute    = root <> "/fixtures/example.md"

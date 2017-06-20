@@ -5,7 +5,7 @@ module Shikensu.Sorting
     ( sortByAbsolutePath
     ) where
 
-import Shikensu.Types (Definition, absolutePath)
+import Shikensu.Internal.Types (Definition, absolutePath)
 
 
 {-| Sort by absolutePath.

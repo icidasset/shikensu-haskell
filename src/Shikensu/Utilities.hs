@@ -11,7 +11,7 @@ import Data.Maybe (fromMaybe)
 import Data.Monoid ((<>))
 import Data.Text (Text)
 import Flow
-import Shikensu.Types
+import Shikensu.Internal.Types
 
 import qualified Data.Aeson as Json (Object, Result(..), encode)
 import qualified Data.HashMap.Strict as HashMap (lookup)
@@ -46,7 +46,7 @@ mapIO =
 
 From multiple IO monads to a single IO monad.
 -}
-lsequence :: Monad m => [( String, m a )] -> m [( String, a )]
+lsequence :: Monad m => [( id, m a )] -> m [( id, a )]
 lsequence list =
     let
         unzippedList =
