@@ -5,6 +5,7 @@ module Test.Utilities
 import Flow
 import Shikensu
 import Shikensu.Utilities as Utils
+import System.FilePath ((</>))
 import Test.Helpers
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -22,6 +23,15 @@ utilityTests = testGroup
 
 
 
+-- Test data
+
+
+thePattern :: String
+thePattern =
+    "tests" </> "fixtures" </> "example.md"
+
+
+
 -- Tests
 
 
@@ -30,8 +40,8 @@ testSequencing =
     let
         result =
             Utils.lsequence
-                [ ( "a", Shikensu.listRelative ["tests/fixtures/example.md"] "." )
-                , ( "b", Shikensu.listRelative ["tests/fixtures/example.md"] "." )
+                [ ( "a", Shikensu.listRelative [thePattern] "." )
+                , ( "b", Shikensu.listRelative [thePattern] "." )
                 ]
     in
         testCase "Test lsequence"
@@ -43,7 +53,7 @@ testMetadataAccessors =
     let
         definition =
             "."
-                |> define "tests/fixtures/example.md"
+                |> define thePattern
                 |> fmap (Contrib.insertMetadataDef $ HashMap.singleton "a" "Hi!")
 
         resultExisting =

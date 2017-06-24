@@ -36,8 +36,8 @@ assertEqm a b =
 
 
 define :: String -> String -> IO Definition
-define pattern root =
+define thePattern root =
     root
-        |> Shikensu.listRelative [pattern]
+        |> Shikensu.listRelative [ thePattern ]
         |> fmap (List.sortBy sortByAbsolutePath)
         |> fmap List.head

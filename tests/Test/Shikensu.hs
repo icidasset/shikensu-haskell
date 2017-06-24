@@ -2,6 +2,7 @@ module Test.Shikensu
     ( shikensuTests
     ) where
 
+import System.FilePath ((</>))
 import Test.Helpers
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -27,7 +28,8 @@ shikensuTests = testGroup
 testRegular :: TestTree
 testRegular =
     let
-        definition = define "tests/**/*.md" "."
+        thePattern = "tests" </> "**" </> "*.md"
+        definition = define thePattern "."
     in
         testGroup "Test regular"
             [ testCase "Should have the correct basename"
@@ -40,7 +42,7 @@ testRegular =
             $ assertDef definition Shikensu.extname ".md"
 
             , testCase "Should have the correct pattern"
-            $ assertDef definition Shikensu.pattern "tests/**/*.md"
+            $ assertDef definition Shikensu.pattern thePattern
 
             , testCase "Should have the correct workingDirname"
             $ assertDef definition Shikensu.workingDirname "tests"
@@ -51,7 +53,8 @@ testRegular =
 testDot :: TestTree
 testDot =
     let
-        definition = define "./tests/**/*.md" "."
+        thePattern = "." </> "tests" </> "**" </> "*.md"
+        definition = define thePattern "."
     in
         testGroup "Test dot"
             [ testCase "Should have the correct basename"
@@ -64,7 +67,7 @@ testDot =
             $ assertDef definition Shikensu.extname ".md"
 
             , testCase "Should have the correct pattern"
-            $ assertDef definition Shikensu.pattern "./tests/**/*.md"
+            $ assertDef definition Shikensu.pattern thePattern
 
             , testCase "Should have the correct workingDirname"
             $ assertDef definition Shikensu.workingDirname "tests"
@@ -75,7 +78,8 @@ testDot =
 testWithoutWd :: TestTree
 testWithoutWd =
     let
-        definition = define "**/*.md" "./tests"
+        thePattern = "**" </> "*.md"
+        definition = define thePattern "tests"
     in
         testGroup "Test without workingDirname"
             [ testCase "Should have the correct basename"
@@ -88,7 +92,7 @@ testWithoutWd =
             $ assertDef definition Shikensu.extname ".md"
 
             , testCase "Should have the correct pattern"
-            $ assertDef definition Shikensu.pattern "**/*.md"
+            $ assertDef definition Shikensu.pattern thePattern
 
             , testCase "Should have the correct workingDirname"
             $ assertDef definition Shikensu.workingDirname ""
@@ -99,7 +103,8 @@ testWithoutWd =
 testRootFile :: TestTree
 testRootFile =
     let
-        definition = define "*.md" "."
+        thePattern = "*.md"
+        definition = define thePattern "."
     in
         testGroup "Test file in root path"
             [ testCase "Should have the correct basename"
@@ -112,7 +117,7 @@ testRootFile =
             $ assertDef definition Shikensu.extname ".md"
 
             , testCase "Should have the correct pattern"
-            $ assertDef definition Shikensu.pattern "*.md"
+            $ assertDef definition Shikensu.pattern thePattern
 
             , testCase "Should have the correct workingDirname"
             $ assertDef definition Shikensu.workingDirname ""

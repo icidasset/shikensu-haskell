@@ -1,7 +1,7 @@
 module Main where
 
-import System.Directory (canonicalizePath, removePathForcibly)
-import System.FilePath (combine)
+import System.Directory (getCurrentDirectory, removePathForcibly)
+import System.FilePath ((</>))
 import Test.Contrib
 import Test.Example
 import Test.Shikensu
@@ -11,8 +11,8 @@ import Test.Utilities
 
 main :: IO ()
 main = do
-    root        <- canonicalizePath "./"
-    _           <- removePathForcibly (combine root "tests/build")
+    root        <- getCurrentDirectory
+    _           <- removePathForcibly (root </> "tests" </> "build")
 
     defaultMain tests
 

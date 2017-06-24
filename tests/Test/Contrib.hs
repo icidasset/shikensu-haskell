@@ -3,8 +3,9 @@ module Test.Contrib
     ) where
 
 import Data.ByteString (ByteString)
+import Data.Monoid ((<>))
 import Flow
-import System.FilePath (joinPath)
+import System.FilePath
 import Test.Helpers
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -43,13 +44,13 @@ contribTests = testGroup
 
 
 list :: String -> IO Shikensu.Dictionary
-list pattern =
-    Shikensu.listRelative [pattern] "."
+list thePattern =
+    Shikensu.listRelative [thePattern] "."
 
 
 example_md :: IO Shikensu.Dictionary
 example_md =
-    list "tests/fixtures/example.md"
+    list $ joinPath [ "tests", "fixtures", "example.md" ]
 
 
 renderer :: Shikensu.Definition -> Maybe ByteString
@@ -61,6 +62,11 @@ renderer def =
         def
             |> Shikensu.content
             |> fmap (\c -> BS.intercalate B.empty [openingTag, c, closingTag])
+
+
+upstairs :: String
+upstairs =
+    addTrailingPathSeparator ".."
 
 
 
@@ -116,12 +122,12 @@ testMetadata =
             )
             example_md
 
-        definition      = fmap (List.reverse .> List.head) dictionary
+        definition          = fmap (List.reverse .> List.head) dictionary
 
-        lookupTitle     = \def -> HashMap.lookup keyA (Shikensu.metadata def)
-        lookupHello     = \def -> HashMap.lookup keyB (Shikensu.metadata def)
-        lookupRemoved   = \def -> HashMap.lookup keyC (Shikensu.metadata def)
-        lookupBasename  = \def -> HashMap.lookup keyBase (Shikensu.metadata def)
+        lookupTitle     def = HashMap.lookup keyA (Shikensu.metadata def)
+        lookupHello     def = HashMap.lookup keyB (Shikensu.metadata def)
+        lookupRemoved   def = HashMap.lookup keyC (Shikensu.metadata def)
+        lookupBasename  def = HashMap.lookup keyBase (Shikensu.metadata def)
     in
         testGroup
             "Metadata"
@@ -149,13 +155,13 @@ testPermalink =
         testGroup
             "Permalink"
             [ testCase "Should have the correct `localPath`"
-            $ assertDef definition Shikensu.localPath "example/index.md"
+            $ assertDef definition Shikensu.localPath ("example" </> "index.md")
 
             , testCase "Should have the correct `parentPath`"
-            $ assertDef definition Shikensu.parentPath (Just "../")
+            $ assertDef definition Shikensu.parentPath (Just upstairs)
 
             , testCase "Should have the correct `pathToRoot`"
-            $ assertDef definition Shikensu.pathToRoot "../"
+            $ assertDef definition Shikensu.pathToRoot upstairs
             ]
 
 
@@ -163,19 +169,22 @@ testPermalink =
 testPrefixDirname :: TestTree
 testPrefixDirname =
     let
-        dictionary = fmap (Contrib.prefixDirname "prefix/") (list "tests/**/example.md")
+        thePrefix  = addTrailingPathSeparator "prefix"
+        thePattern = "tests" </> "**" </> "example.md"
+
+        dictionary = fmap (Contrib.prefixDirname thePrefix) (list thePattern)
         definition = fmap List.head dictionary
     in
         testGroup
             "PrefixDirname"
             [ testCase "Should have the correct `dirname`"
-            $ assertDef definition Shikensu.dirname "prefix/fixtures"
-
-            , testCase "Should have the correct `pathToRoot`"
-            $ assertDef definition Shikensu.pathToRoot "../../"
+            $ assertDef definition Shikensu.dirname ("prefix" </> "fixtures")
 
             , testCase "Should have the correct `parentPath`"
-            $ assertDef definition Shikensu.parentPath (Just "../")
+            $ assertDef definition Shikensu.parentPath (Just upstairs)
+
+            , testCase "Should have the correct `pathToRoot`"
+            $ assertDef definition Shikensu.pathToRoot (upstairs <> upstairs)
             ]
 
 
@@ -228,8 +237,10 @@ testRenderContent =
 testWrite :: TestTree
 testWrite =
     let
-        destination = "tests/build/"
-        dictionary  = list "tests/**/example.md"
+        destination = "tests" </> "build" <> [ pathSeparator ]
+        thePattern  = "tests" </> "**" </> "example.md"
+
+        dictionary  = list thePattern
             >>= Contrib.IO.read
             >>= Contrib.IO.write destination
 
@@ -237,5 +248,5 @@ testWrite =
     in
         testCase "Should `write`"
         $ fmap Shikensu.rootDirname definition
-            >>= \r -> readFile (joinPath [r, destination, "fixtures/example.md"])
+            >>= \r -> readFile (joinPath [ r, destination, "fixtures", "example.md" ])
             >>= \c -> assertEq "# Example\n" c

@@ -40,7 +40,7 @@ compileParentPath :: FilePath -> Maybe FilePath
 compileParentPath dirname =
     case dirname of
         "" -> Nothing
-        _  -> Just "../"
+        _  -> Just $ addTrailingPathSeparator ".."
 
 
 {-| Path to root.

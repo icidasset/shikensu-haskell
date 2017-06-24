@@ -3,14 +3,14 @@ module Test.Example
     ) where
 
 import Data.ByteString (ByteString)
-import Data.Monoid ((<>))
 import Data.Text (Text)
 import Flow
 import Prelude hiding (read)
 import Shikensu (Definition(..), Dictionary(..), list, makeDefinition)
 import Shikensu.Contrib (clone, copyPropsToMetadata, permalink, renameExt, renderContent)
 import Shikensu.Contrib.IO (read, write)
-import System.Directory (canonicalizePath)
+import System.Directory (getCurrentDirectory)
+import System.FilePath ((</>), joinPath)
 import Test.Helpers
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -23,13 +23,20 @@ exampleTests =
     testCase "Example test" $ dictionaries >>= uncurry assertEq
 
 
+thePattern :: String
+thePattern =
+    "fixtures" </> "*.md"
+
+
 dictionaries :: IO (Dictionary, Dictionary)
 dictionaries = do
-    root            <- canonicalizePath "./tests"
-    dictA           <- dictionary_io root
+    root            <- getCurrentDirectory
 
-    let absolute    = root <> "/fixtures/example.md"
-    let dictB       = [Shikensu.makeDefinition root "fixtures/*.md" absolute]
+    let testsDir    = root </> "tests"
+    dictA           <- dictionary_io testsDir
+
+    let absolute    = testsDir </> "fixtures" </> "example.md"
+    let dictB       = [ Shikensu.makeDefinition testsDir thePattern absolute ]
 
     dictB_Read      <- read dictB
     dictB_Final     <- flow dictB_Read
@@ -43,10 +50,10 @@ dictionaries = do
 
 dictionary_io :: String -> IO Dictionary
 dictionary_io absolutePathToCwd =
-    Shikensu.list ["fixtures/*.md"] absolutePathToCwd
+    Shikensu.list [thePattern] absolutePathToCwd
         >>= read
         >>= flow
-        >>= write "./build"
+        >>= write "build"
 
 
 flow :: Dictionary -> IO Dictionary
