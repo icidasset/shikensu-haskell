@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.3.7
+
+- Windows support
+
 ### v0.3.6
 
 - Use Stackage Nightly
