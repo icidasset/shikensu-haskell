@@ -7,6 +7,13 @@ cache:
     - $HOME/.stack
 
 
+# Test on multiple operating systems
+os:
+  - osx
+  - linux
+  - windows
+
+
 # Ensure necessary system libraries are present
 addons:
   apt:
