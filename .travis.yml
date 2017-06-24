@@ -4,35 +4,53 @@ language: generic
 
 cache:
   directories:
+    - $HOME/.ghc
+    - $HOME/.cabal
     - $HOME/.stack
 
 
 # Test on multiple operating systems
-os:
-  - osx
-  - linux
-  - windows
-
-
-# Ensure necessary system libraries are present
-addons:
-  apt:
-    packages:
-      - libgmp-dev
+matrix:
+  include:
+    - env: BUILD=stack ARGS=""
+      compiler: ": #stack default"
+      addons: {apt: {packages: [libgmp-dev]}}
+    - env: BUILD=stack ARGS=""
+      compiler: ": #stack default osx"
+      os: osx
 
 
 # Download and unpack the stack executable
 before_install:
+  - unset CC
+  - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$HOME/.local/bin:/opt/alex/$ALEXVER/bin:/opt/happy/$HAPPYVER/bin:$HOME/.cabal/bin:$PATH
   - mkdir -p ~/.local/bin
-  - export PATH=$HOME/.local/bin:$PATH
-  - travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+  - |
+    if [ `uname` = "Darwin" ]
+    then
+      travis_retry curl --insecure -L https://www.stackage.org/stack/osx-x86_64 | tar xz --strip-components=1 --include '*/stack' -C ~/.local/bin
+    else
+      travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+    fi
+
+    # Use the more reliable S3 mirror of Hackage
+    mkdir -p $HOME/.cabal
+    echo 'remote-repo: hackage.haskell.org:http://hackage.fpcomplete.com/' > $HOME/.cabal/config
+    echo 'remote-repo-cache: $HOME/.cabal/packages' >> $HOME/.cabal/config
+
+    if [ "$CABALVER" != "1.16" ]
+    then
+      echo 'jobs: $ncpus' >> $HOME/.cabal/config
+    fi
 
 
 # Build dependencies
 install:
-  - stack --no-terminal --install-ghc test --only-dependencies
+  - echo "$(ghc --version) [$(ghc --print-project-git-commit-id 2> /dev/null || echo '?')]"
+  - if [ -f configure.ac ]; then autoreconf -i; fi
+  - stack --no-terminal --install-ghc $ARGS test --bench --only-dependencies
 
 
 # Build the package, its tests, and its docs and run the tests
 script:
-  - stack --no-terminal test --haddock --no-haddock-deps
+  - stack --no-terminal $ARGS test --bench --no-run-benchmarks --haddock --no-haddock-deps
