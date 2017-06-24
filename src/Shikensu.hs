@@ -125,10 +125,10 @@ makeDefinition :: FilePath -> String -> FilePath -> Definition
 makeDefinition rootDirname pattern absolutePath =
     let
         workingDirname      = commonDirectory pattern
-        rootWorkingDirname  = combine rootDirname workingDirname
+        rootWorkingDirname  = (combine rootDirname workingDirname) <> [ pathSeparator ]
 
         theAbsolutePath     = normalise absolutePath
-        theLocalPath        = dropDrive (stripPrefix rootWorkingDirname theAbsolutePath)
+        theLocalPath        = stripPrefix rootWorkingDirname theAbsolutePath
     in
         Definition
             { basename        = takeBaseName theLocalPath
