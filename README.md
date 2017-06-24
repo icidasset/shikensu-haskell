@@ -8,6 +8,7 @@ __Build static websites with ease__, without conforming to a specific structure.
 
 [![](https://www.stackage.org/package/shikensu/badge/nightly?label=version)](https://www.stackage.org/package/shikensu)
 [![](https://travis-ci.org/icidasset/shikensu.svg?branch=master)](https://travis-ci.org/icidasset/shikensu)
+[![](https://ci.appveyor.com/api/projects/status/github/icidasset/shikensu?branch=master&svg=true)](https://ci.appveyor.com/project/icidasset/shikensu)
 
 
 
