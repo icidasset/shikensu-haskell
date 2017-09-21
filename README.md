@@ -26,6 +26,13 @@ import Prelude hiding (read)
 import qualified Data.Text.Encoding as Text (decodeUtf8, encodeUtf8)
 
 
+main :: IO Dictionary
+main =
+  -- This IO operation will read the files matching the glob pattern `src/**/*.md`,
+  -- transform them (see the `flow` function) and then write them to the `build` directory.
+  dictionary_io
+
+
 dictionary_io :: IO Dictionary
 dictionary_io =
     Shikensu.listRelative ["src/**/*.md"] "./"
