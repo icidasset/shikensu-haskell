@@ -35,6 +35,7 @@ contribTests = testGroup
     , testRename
     , testRenameExt
     , testRenderContent
+    , testTransformContent
     , testWrite
     ]
 
@@ -232,6 +233,17 @@ testRenderContent =
         testCase "Should `renderContent`"
         $ assertDef definition (Shikensu.content .> fmap Text.decodeUtf8) theResult
 
+
+
+testTransformContent :: TestTree
+testTransformContent =
+    let
+        theResult  = Just (Text.pack "<html># Example\n</html>")
+        dictionary = fmap (Contrib.transformContent renderer) (example_md >>= Contrib.IO.read)
+        definition = fmap List.head dictionary
+    in
+        testCase "Should `transformContent`"
+        $ assertDef definition (Shikensu.content .> fmap Text.decodeUtf8) theResult
 
 
 testWrite :: TestTree

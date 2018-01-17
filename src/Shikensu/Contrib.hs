@@ -22,6 +22,8 @@ module Shikensu.Contrib
     , renderContentDef
     , replaceMetadata
     , replaceMetadataDef
+    , transformContent
+    , transformContentDef
     ) where
 
 import Data.ByteString (ByteString)
@@ -235,3 +237,17 @@ replaceMetadata a =
 replaceMetadataDef :: Metadata -> Definition -> Definition
 replaceMetadataDef given def =
     def { metadata = given }
+
+
+{-| Transform content.
+
+Alias for `renderContent`.
+
+-}
+transformContent :: (Definition -> Maybe ByteString) -> Dictionary -> Dictionary
+transformContent = renderContent
+
+
+transformContentDef :: (Definition -> Maybe ByteString) -> Definition -> Definition
+transformContentDef =
+    renderContentDef

@@ -3,6 +3,7 @@
 ### v0.3.8
 
 - Update dependencies
+- Added `Shikensu.Contrib.transformContent` as an alias for `renderContent`
 
 ### v0.3.7
 
