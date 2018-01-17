@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.3.8
+
+- Update dependencies
+
 ### v0.3.7
 
 - Windows support
