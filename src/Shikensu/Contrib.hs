@@ -22,6 +22,8 @@ module Shikensu.Contrib
     , renderContentDef
     , replaceMetadata
     , replaceMetadataDef
+    , setContent
+    , setContentDef
     , transformContent
     , transformContentDef
     ) where
@@ -239,10 +241,23 @@ replaceMetadataDef given def =
     def { metadata = given }
 
 
+{-| Set content.
+
+Set content directly.
+-}
+setContent :: ByteString -> Dictionary -> Dictionary
+setContent content =
+    fmap (setContentDef content)
+
+
+setContentDef :: ByteString -> Definition -> Definition
+setContentDef content def =
+    def { content = Just content }
+
+
 {-| Transform content.
 
 Alias for `renderContent`.
-
 -}
 transformContent :: (Definition -> Maybe ByteString) -> Dictionary -> Dictionary
 transformContent = renderContent

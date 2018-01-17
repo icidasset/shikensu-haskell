@@ -16,7 +16,7 @@ import qualified Data.ByteString.Char8 as BS (intercalate, pack)
 import qualified Data.HashMap.Strict as HashMap (fromList, lookup)
 import qualified Data.List as List (head, reverse)
 import qualified Data.Text as Text (pack, unpack)
-import qualified Data.Text.Encoding as Text (decodeUtf8)
+import qualified Data.Text.Encoding as Text (decodeUtf8, encodeUtf8)
 import qualified Data.Text.IO as Text (readFile)
 import qualified Shikensu
 import qualified Shikensu.Contrib as Contrib
@@ -35,6 +35,7 @@ contribTests = testGroup
     , testRename
     , testRenameExt
     , testRenderContent
+    , testSetContent
     , testTransformContent
     , testWrite
     ]
@@ -233,6 +234,16 @@ testRenderContent =
         testCase "Should `renderContent`"
         $ assertDef definition (Shikensu.content .> fmap Text.decodeUtf8) theResult
 
+
+testSetContent :: TestTree
+testSetContent =
+    let
+        content    = Text.encodeUtf8 "<html># Example\n</html>"
+        dictionary = fmap (Contrib.setContent content) (example_md >>= Contrib.IO.read)
+        definition = fmap List.head dictionary
+    in
+        testCase "Should `setContent`"
+        $ assertDef definition Shikensu.content (Just content)
 
 
 testTransformContent :: TestTree
