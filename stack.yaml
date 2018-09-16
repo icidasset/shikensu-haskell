@@ -1,4 +1,1 @@
-resolver: lts-10.3
-nix:
-  enable: false
-  packages: [zlib]
+resolver: nightly-2018-09-16
