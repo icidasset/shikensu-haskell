@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.3.9
+
+- Adjusted version ranges for test dependencies
+
 ### v0.3.8
 
 - Update dependencies
