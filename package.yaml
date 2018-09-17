@@ -1,5 +1,5 @@
 name: shikensu
-version: 0.3.9
+version: 0.3.10
 maintainer: Steven Vandevelde <icid.asset@gmail.com>
 category: Filesystem
 
@@ -26,6 +26,10 @@ dependencies:
   - Glob >= 0.7 && < 1
   - unordered-containers == 0.2.*
   - text == 1.*
+
+
+extra-source-files:
+  - tests/fixtures/example.md
 
 
 library:

@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.3.10
+
+- Added missing test files to the stack tarball
+
 ### v0.3.9
 
 - Adjusted version ranges for test dependencies
