@@ -1,5 +1,5 @@
 name: shikensu
-version: 0.3.10
+version: 0.3.11
 maintainer: Steven Vandevelde <icid.asset@gmail.com>
 category: Filesystem
 
@@ -29,7 +29,8 @@ dependencies:
 
 
 extra-source-files:
-  - tests/fixtures/example.md
+  - "*.md"
+  - "tests/fixtures/example.md"
 
 
 library:

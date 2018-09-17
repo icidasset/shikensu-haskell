@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.3.11
+
+- Add CHANGELOG and README to the stack tarball
+
 ### v0.3.10
 
 - Added missing test files to the stack tarball
