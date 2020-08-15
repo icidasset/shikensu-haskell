@@ -7,6 +7,7 @@ module Shikensu.Internal.Types where
 import Data.Aeson ((.=), toJSON)
 import Data.ByteString (ByteString)
 import Data.Monoid ((<>))
+import Data.Text (Text)
 import System.FilePath (joinPath)
 
 import qualified Data.Aeson as Aeson (Object, ToJSON, object)
@@ -16,18 +17,18 @@ import qualified Data.Aeson as Aeson (Object, ToJSON, object)
 -}
 data Definition =
     Definition
-        { basename :: String
-        , dirname :: FilePath
-        , extname :: String
-        , pattern :: String
-        , rootDirname :: FilePath
-        , workingDirname :: FilePath
+        { basename :: Text
+        , dirname :: Text
+        , extname :: Text
+        , pattern :: Text
+        , rootDirname :: Text
+        , workingDirname :: Text
 
         -- Additional properties
         , content :: Maybe ByteString
         , metadata :: Metadata
-        , parentPath :: Maybe FilePath
-        , pathToRoot :: FilePath
+        , parentPath :: Maybe Text
+        , pathToRoot :: Text
         } deriving (Eq, Show)
 
 
@@ -49,6 +50,8 @@ instance Aeson.ToJSON Definition where
 
 
 type Dictionary = [Definition]
+
+
 type Metadata = Aeson.Object
 
 
@@ -56,16 +59,16 @@ type Metadata = Aeson.Object
 -- Path functions
 
 
-absolutePath :: Definition -> String
+absolutePath :: Definition -> Text
 absolutePath def =
     joinPath [rootDirname def, workspacePath def]
 
 
-localPath :: Definition -> String
+localPath :: Definition -> Text
 localPath def =
     joinPath [dirname def, basename def <> extname def]
 
 
-workspacePath :: Definition -> String
+workspacePath :: Definition -> Text
 workspacePath def =
     joinPath [workingDirname def, localPath def]

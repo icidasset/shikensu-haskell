@@ -31,10 +31,10 @@ module Shikensu.Contrib
 import Data.ByteString (ByteString)
 import Data.Monoid ((<>))
 import Shikensu (forkDefinition)
+import Shikensu.Internal.Common (compileParentPath, compilePathToRoot)
 import Shikensu.Internal.Types
-import Shikensu.Internal.Utilities (compileParentPath, compilePathToRoot)
 import Shikensu.Metadata (transposeToMetadata)
-import System.FilePath (FilePath, combine)
+import System.Text (Text, combine)
 
 import qualified Data.HashMap.Strict as HashMap (empty, union)
 
@@ -62,7 +62,7 @@ and add that into dictionary just after the matching definition.
 
 > clone "index.html" "200.html" dictionary
 -}
-clone :: FilePath -> FilePath -> Dictionary -> Dictionary
+clone :: Text -> Text -> Dictionary -> Dictionary
 clone existingPath newPath dict =
     let
         makeNew = \def acc ->
@@ -95,7 +95,7 @@ copyPropsToMetadataDef def =
 
 Filter out the definitions that have the given `localPath`.
 -}
-exclude :: FilePath -> Dictionary -> Dictionary
+exclude :: Text -> Dictionary -> Dictionary
 exclude path =
     filter (\def -> localPath def /= path)
 
@@ -124,12 +124,12 @@ It will NOT change definitions that already have the new basename.
 
 > permalink "index" dictionary
 -}
-permalink :: String -> Dictionary -> Dictionary
+permalink :: Text -> Dictionary -> Dictionary
 permalink a =
     fmap (permalinkDef a)
 
 
-permalinkDef :: String -> Definition -> Definition
+permalinkDef :: Text -> Definition -> Definition
 permalinkDef newBasename def =
     if basename def /= newBasename then
        let
@@ -150,11 +150,11 @@ permalinkDef newBasename def =
 
 Prefix the dirname of each definition with a given string.
 -}
-prefixDirname :: String -> Dictionary -> Dictionary
+prefixDirname :: Text -> Dictionary -> Dictionary
 prefixDirname prefix = fmap (prefixDirnameDef prefix)
 
 
-prefixDirnameDef :: String -> Definition -> Definition
+prefixDirnameDef :: Text -> Definition -> Definition
 prefixDirnameDef prefix def =
     let
         newDirname = prefix <> dirname def
@@ -176,11 +176,11 @@ For example, if you have a definition with the local path `a/b/example.html`:
 
 See `Shikensu.localPath` for more info.
 -}
-rename :: FilePath -> FilePath -> Dictionary -> Dictionary
+rename :: Text -> Text -> Dictionary -> Dictionary
 rename a b = fmap (renameDef a b)
 
 
-renameDef :: FilePath -> FilePath -> Definition -> Definition
+renameDef :: Text -> Text -> Definition -> Definition
 renameDef oldPath newPath def =
   if localPath def == oldPath
      then forkDefinition newPath def
@@ -196,12 +196,12 @@ Example:
 > -- The definitions that had the extname ".markdown"
 > -- now have the extname ".html"
 -}
-renameExt :: String -> String -> Dictionary -> Dictionary
+renameExt :: Text -> Text -> Dictionary -> Dictionary
 renameExt a b =
     fmap (renameExtDef a b)
 
 
-renameExtDef :: String -> String -> Definition -> Definition
+renameExtDef :: Text -> Text -> Definition -> Definition
 renameExtDef oldExtname newExtname def =
     if extname def == oldExtname
         then def { extname = newExtname }

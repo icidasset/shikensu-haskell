@@ -1,7 +1,7 @@
 {-| Internal utility functions.
 
 -}
-module Shikensu.Internal.Utilities
+module Shikensu.Internal.Common
     ( commonDirectory
     , compileParentPath
     , compilePathToRoot

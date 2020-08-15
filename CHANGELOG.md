@@ -1,5 +1,9 @@
 # Changelog
 
+### v1.0.0
+
+- Use `Text` instead of `String`
+
 ### v0.3.11
 
 - Add CHANGELOG and README to the stack tarball

@@ -1,10 +1,10 @@
-module Test.Utilities
+module Test.Common
     ( utilityTests
     ) where
 
 import Flow
 import Shikensu
-import Shikensu.Utilities as Utils
+import Shikensu.Common as Common
 import System.FilePath ((</>))
 import Test.Helpers
 import Test.Tasty
@@ -39,7 +39,7 @@ testSequencing :: TestTree
 testSequencing =
     let
         result =
-            Utils.lsequence
+            Common.lsequence
                 [ ( "a", Shikensu.listRelative [thePattern] "." )
                 , ( "b", Shikensu.listRelative [thePattern] "." )
                 ]

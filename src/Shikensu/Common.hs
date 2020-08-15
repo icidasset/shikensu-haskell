@@ -1,4 +1,4 @@
-module Shikensu.Utilities
+module Shikensu.Common
     ( (!~>)
     , (~>)
     , io
@@ -90,7 +90,7 @@ lsequence list =
 
 
 
--- Private
+-- ㊙️
 
 
 fromJSONResult :: ToJSON a => Json.Result a -> a

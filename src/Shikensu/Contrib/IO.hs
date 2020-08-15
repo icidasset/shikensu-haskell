@@ -14,7 +14,7 @@ import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath (FilePath, joinPath, takeDirectory)
 
 import qualified Data.ByteString as B (empty, readFile, writeFile)
-import qualified Shikensu.Utilities as Utilities (mapIO)
+import qualified Shikensu.Common as Common (mapIO)
 
 
 {-| Read.
@@ -24,7 +24,7 @@ put that content in the `content` property.
 -}
 read :: Dictionary -> IO Dictionary
 read =
-    Utilities.mapIO readDef
+    Common.mapIO readDef
 
 
 readDef :: Definition -> IO Definition
@@ -50,13 +50,14 @@ The path of the new file is `joinPath [rootDirname, givenDirectoryName, localPat
 -}
 write :: FilePath -> Dictionary -> IO Dictionary
 write dest =
-    Utilities.mapIO (writeDef dest)
+    Common.mapIO (writeDef dest)
 
 
 writeDef :: FilePath -> Definition -> IO Definition
 writeDef dest def =
     let
         path = joinPath [rootDirname def, dest, localPath def]
+
         cont = fromMaybe B.empty (content def)
     in
         createDirectoryIfMissing True (takeDirectory path)

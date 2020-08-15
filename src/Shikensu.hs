@@ -16,8 +16,8 @@ module Shikensu
 
 import Data.Monoid ((<>))
 import Flow
+import Shikensu.Internal.Common
 import Shikensu.Internal.Types
-import Shikensu.Internal.Utilities
 import System.FilePath
 
 import qualified Data.HashMap.Strict as HashMap (empty)

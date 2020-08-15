@@ -1,5 +1,5 @@
 name: shikensu
-version: 0.3.11
+version: 1.0.0
 maintainer: Steven Vandevelde <icid.asset@gmail.com>
 category: Filesystem
 
@@ -8,12 +8,6 @@ synopsis: Run a sequence of functions on in-memory representations of files
 description: See README at <https://github.com/icidasset/shikensu#readme>
 license: MIT
 github: icidasset/shikensu
-
-
-default-extensions:
-   DisambiguateRecordFields
-   DuplicateRecordFields
-   OverloadedStrings
 
 
 dependencies:
@@ -28,13 +22,19 @@ dependencies:
   - text == 1.*
 
 
-extra-source-files:
-  - "*.md"
-  - "tests/fixtures/example.md"
+default-extensions:
+   DisambiguateRecordFields
+   DuplicateRecordFields
+   OverloadedStrings
 
 
 library:
   source-dirs: src
+
+
+extra-source-files:
+  - "*.md"
+  - "tests/fixtures/example.md"
 
 
 tests:
