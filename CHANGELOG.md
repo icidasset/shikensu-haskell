@@ -4,6 +4,9 @@
 
 Update dependencies, in particular, aeson v2.
 
+__Breaking changes__:
+Replaces usage of `Data.HashMap.Strict` (unordered-containers package) with `Data.Aeson.KeyMap` (aeson package) for the metadata, the API for both data structures is mostly the same.
+
 
 ### v0.3.11
 
