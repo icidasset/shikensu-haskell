@@ -14,7 +14,8 @@ import Flow
 import Shikensu.Internal.Types
 
 import qualified Data.Aeson as Json (Object, Result(..), encode)
-import qualified Data.HashMap.Strict as HashMap (lookup)
+import qualified Data.Aeson.KeyMap as KeyMap (lookup)
+import qualified Data.Aeson.Key as Key (fromText)
 import qualified Data.List as List (unzip, zip)
 import qualified Data.Text as Text (unpack)
 import qualified Data.Text.Lazy as Lazy.Text (unpack)
@@ -72,7 +73,8 @@ lsequence list =
 -}
 (~>) :: (FromJSON a, ToJSON a) => Metadata -> Text -> Maybe a
 (~>) obj key =
-    HashMap.lookup key obj
+    obj
+        |> KeyMap.lookup (Key.fromText key)
         |> fmap fromJSON
         |> fmap fromJSONResult
 

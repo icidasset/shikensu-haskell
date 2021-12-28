@@ -1,16 +1,21 @@
 # Changelog
 
+### v0.4.0
+
+Update dependencies, in particular, aeson v2.
+
+
 ### v0.3.11
 
-- Add CHANGELOG and README to the stack tarball
+Add CHANGELOG and README to the stack tarball.
 
 ### v0.3.10
 
-- Added missing test files to the stack tarball
+Added missing test files to the stack tarball.
 
 ### v0.3.9
 
-- Adjusted version ranges for test dependencies
+Adjusted version ranges for test dependencies.
 
 ### v0.3.8
 
@@ -52,6 +57,7 @@
 - Added `listRelative` and it's flipped relative
 - Updated dependencies
 
+
 ### v0.2.1
 
 - Fix order of the `list` function parameters
@@ -61,6 +67,7 @@
 - Split up `Utilities` to internal and non-internal
 - Add more `Utilities` (sequence utils, metadata helpers, etc.)
 - Clean up code
+
 
 ### v0.1.3
 

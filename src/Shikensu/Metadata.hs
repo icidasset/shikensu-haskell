@@ -10,7 +10,7 @@ import Flow
 import Shikensu.Internal.Types
 
 import qualified Data.Aeson as Aeson (FromJSON, Result(..), ToJSON, fromJSON, toJSON)
-import qualified Data.HashMap.Strict as HashMap (empty)
+import qualified Data.Aeson.KeyMap as KeyMap (empty, fromList)
 
 
 {-| Transpose metadata.
@@ -22,15 +22,15 @@ which implements the Aeson.FromJSON instance.
 >     Example { some :: Text }
 >     deriving (Generic, FromJSON)
 >
-> hashMap     = HashMap.fromList [ ("some", "metadata") ]
+> keyMap      = KeyMap.fromList [ ("some", "metadata") ]
 > defaultEx   = Example { some = "default" }
-> example     = transposeMetadata hashMap defaultEx :: Example
+> example     = transposeMetadata keyMap defaultEx :: Example
 
 -}
 transposeMetadata :: Aeson.FromJSON a => Metadata -> a -> a
-transposeMetadata hashMap fallback =
+transposeMetadata keyMap fallback =
     let
-        result = hashMap
+        result = keyMap
             |> Aeson.toJSON
             |> Aeson.fromJSON :: Aeson.FromJSON b => Aeson.Result b
     in
@@ -50,4 +50,4 @@ transposeToMetadata generic =
     in
         case result of
             Aeson.Success x -> x
-            Aeson.Error _   -> HashMap.empty
+            Aeson.Error _   -> KeyMap.empty

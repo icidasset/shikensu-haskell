@@ -20,7 +20,7 @@ import Shikensu.Internal.Types
 import Shikensu.Internal.Utilities
 import System.FilePath
 
-import qualified Data.HashMap.Strict as HashMap (empty)
+import qualified Data.Aeson.KeyMap as KeyMap (empty)
 import qualified Data.List as List (concatMap, map, zip)
 import qualified System.Directory as Dir (canonicalizePath)
 import qualified System.FilePath.Glob as Glob (compile, globDir1)
@@ -115,7 +115,7 @@ Example definition, given:
 >     , workingDirname = "example"
 >
 >     , content = Nothing
->     , metadata = HashMap.empty
+>     , metadata = KeyMap.empty
 >     , parentPath = "../"
 >     , pathToRoot = "../../"
 >     }
@@ -140,7 +140,7 @@ makeDefinition rootDirname pattern absolutePath =
 
             -- Additional properties
             , content         = Nothing
-            , metadata        = HashMap.empty
+            , metadata        = KeyMap.empty
             , parentPath      = compileParentPath $ takeDirName theLocalPath
             , pathToRoot      = compilePathToRoot $ takeDirName theLocalPath
             }

@@ -36,7 +36,7 @@ import Shikensu.Internal.Utilities (compileParentPath, compilePathToRoot)
 import Shikensu.Metadata (transposeToMetadata)
 import System.FilePath (FilePath, combine)
 
-import qualified Data.HashMap.Strict as HashMap (empty, union)
+import qualified Data.Aeson.KeyMap as KeyMap (empty, union)
 
 
 {-| Clear metadata.
@@ -50,7 +50,7 @@ clearMetadata =
 
 clearMetadataDef :: Definition -> Definition
 clearMetadataDef def =
-    def { metadata = HashMap.empty }
+    def { metadata = KeyMap.empty }
 
 
 
@@ -87,7 +87,7 @@ copyPropsToMetadata =
 copyPropsToMetadataDef :: Definition -> Definition
 copyPropsToMetadataDef def =
     def
-        { metadata = HashMap.union (transposeToMetadata def) (metadata def) }
+        { metadata = KeyMap.union (transposeToMetadata def) (metadata def) }
 
 
 
@@ -112,7 +112,7 @@ insertMetadata a =
 
 insertMetadataDef :: Metadata -> Definition -> Definition
 insertMetadataDef given def =
-    def { metadata = HashMap.union given (metadata def) }
+    def { metadata = KeyMap.union given (metadata def) }
 
 
 

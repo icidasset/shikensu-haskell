@@ -11,9 +11,10 @@ import Test.Tasty
 import Test.Tasty.HUnit
 
 import qualified Data.Aeson.Types as Aeson (Value(..))
+import qualified Data.Aeson.Key as Key (fromText)
 import qualified Data.ByteString as B (empty)
 import qualified Data.ByteString.Char8 as BS (intercalate, pack)
-import qualified Data.HashMap.Strict as HashMap (fromList, lookup)
+import qualified Data.Aeson.KeyMap as KeyMap (fromList, lookup)
 import qualified Data.List as List (head, reverse)
 import qualified Data.Text as Text (pack, unpack)
 import qualified Data.Text.Encoding as Text (decodeUtf8, encodeUtf8)
@@ -100,16 +101,16 @@ testExclude =
 testMetadata :: TestTree
 testMetadata =
     let
-        keyA        = Text.pack "title"
+        keyA        = Key.fromText (Text.pack "title")
         valueA      = Aeson.String (Text.pack "Hello world!")
 
-        keyB        = Text.pack "hello"
+        keyB        = Key.fromText (Text.pack "hello")
         valueB      = Aeson.String (Text.pack "Guardian.")
 
-        keyC        = Text.pack "removed"
+        keyC        = Key.fromText (Text.pack "removed")
         valueC      = Aeson.String (Text.pack "Me.")
 
-        keyBase     = Text.pack "basename"
+        keyBase     = Key.fromText (Text.pack "basename")
         valueBase   = Aeson.String (Text.pack "example")
 
         -- 1. Insert C
@@ -117,19 +118,19 @@ testMetadata =
         -- 3. Insert B
         dictionary = fmap
             ( id
-                .> Contrib.insertMetadata   (HashMap.fromList [ (keyC, valueC) ])
-                .> Contrib.replaceMetadata  (HashMap.fromList [ (keyA, valueA) ])
+                .> Contrib.insertMetadata   (KeyMap.fromList [ (keyC, valueC) ])
+                .> Contrib.replaceMetadata  (KeyMap.fromList [ (keyA, valueA) ])
                 .> Contrib.copyPropsToMetadata
-                .> Contrib.insertMetadata   (HashMap.fromList [ (keyB, valueB) ])
+                .> Contrib.insertMetadata   (KeyMap.fromList [ (keyB, valueB) ])
             )
             example_md
 
         definition          = fmap (List.reverse .> List.head) dictionary
 
-        lookupTitle     def = HashMap.lookup keyA (Shikensu.metadata def)
-        lookupHello     def = HashMap.lookup keyB (Shikensu.metadata def)
-        lookupRemoved   def = HashMap.lookup keyC (Shikensu.metadata def)
-        lookupBasename  def = HashMap.lookup keyBase (Shikensu.metadata def)
+        lookupTitle     def = KeyMap.lookup keyA (Shikensu.metadata def)
+        lookupHello     def = KeyMap.lookup keyB (Shikensu.metadata def)
+        lookupRemoved   def = KeyMap.lookup keyC (Shikensu.metadata def)
+        lookupBasename  def = KeyMap.lookup keyBase (Shikensu.metadata def)
     in
         testGroup
             "Metadata"

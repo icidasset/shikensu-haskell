@@ -1,5 +1,5 @@
 name: shikensu
-version: 0.3.11
+version: 0.4.0
 maintainer: Steven Vandevelde <icid.asset@gmail.com>
 category: Filesystem
 
@@ -17,9 +17,9 @@ default-extensions:
 
 
 dependencies:
-  - aeson == 1.*
+  - aeson == 2.*
   - base >= 4.9 && < 5
-  - bytestring == 0.10.*
+  - bytestring >= 0.10 && < 0.12
   - directory == 1.*
   - filepath == 1.*
   - flow == 1.*

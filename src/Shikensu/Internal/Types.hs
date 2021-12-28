@@ -5,11 +5,12 @@
 module Shikensu.Internal.Types where
 
 import Data.Aeson ((.=), toJSON)
+import Data.Aeson.KeyMap (KeyMap)
 import Data.ByteString (ByteString)
 import Data.Monoid ((<>))
 import System.FilePath (joinPath)
 
-import qualified Data.Aeson as Aeson (Object, ToJSON, object)
+import qualified Data.Aeson as Aeson (ToJSON, Value, object)
 
 
 {-| A file definition, along with some additional properties.
@@ -49,7 +50,7 @@ instance Aeson.ToJSON Definition where
 
 
 type Dictionary = [Definition]
-type Metadata = Aeson.Object
+type Metadata = KeyMap Aeson.Value
 
 
 

@@ -10,7 +10,7 @@ import Test.Helpers
 import Test.Tasty
 import Test.Tasty.HUnit
 
-import qualified Data.HashMap.Strict as HashMap (singleton)
+import qualified Data.Aeson.KeyMap as KeyMap (singleton)
 import qualified Data.List as List (head)
 import qualified Data.Tuple as Tuple (fst)
 import qualified Shikensu.Contrib as Contrib
@@ -54,7 +54,7 @@ testMetadataAccessors =
         definition =
             "."
                 |> define thePattern
-                |> fmap (Contrib.insertMetadataDef $ HashMap.singleton "a" "Hi!")
+                |> fmap (Contrib.insertMetadataDef $ KeyMap.singleton "a" "Hi!")
 
         resultExisting =
             fmap (\d -> metadata d ~> "a" :: Maybe String) definition
