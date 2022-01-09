@@ -1,5 +1,5 @@
 name: shikensu
-version: 0.4.0
+version: 0.4.1
 maintainer: Steven Vandevelde <icid.asset@gmail.com>
 category: Filesystem
 
@@ -22,7 +22,7 @@ dependencies:
   - bytestring >= 0.10 && < 0.12
   - directory == 1.*
   - filepath == 1.*
-  - flow == 1.*
+  - flow >= 1.0 && < 3
   - Glob >= 0.7 && < 1
   - unordered-containers == 0.2.*
   - text == 1.*

@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.4.1
+
+Update `flow` dependency.
+
 ### v0.4.0
 
 Update dependencies, in particular, aeson v2.

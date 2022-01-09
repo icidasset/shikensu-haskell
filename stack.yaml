@@ -1,3 +1,4 @@
 resolver: nightly-2021-12-26
 extra-deps:
   - aeson-2.0.2.0
+  - flow-2.0.0.0
